@@ -1,5 +1,5 @@
 ##############################################################################
-#	UnixBench v5.1.1
+#	UnixBench v5.1.3
 #  Based on The BYTE UNIX Benchmarks - Release 3
 #          Module: Makefile   SID: 3.9 5/15/91 19:30:15
 #
@@ -30,6 +30,7 @@
 #                    09/26/07 changes for UnixBench 5.0
 #                    09/30/07 adding ubgears, GRAPHIC_TESTS switch
 #                    10/14/07 adding large.txt
+#                    01/13/11 added support for parallel compilation
 ##############################################################################
 
 ##############################################################################
@@ -43,7 +44,7 @@ SHELL = /bin/sh
 # X11 libraries on your system.
 #
 # Comment the line out to disable these tests.
-GRAPHIC_TESTS = defined
+# GRAPHIC_TESTS = defined
 
 # Set "GL_LIBS" to the libraries needed to link a GL program.
 GL_LIBS = -lGL -lXext -lX11
@@ -228,10 +229,10 @@ $(PROGDIR)/dhry2: $(SRCDIR)/dhry_1.c $(SRCDIR)/dhry_2.c $(SRCDIR)/dhry.h
 	$(CC) -o $(PROGDIR)/dhry2 ${CFLAGS} ${OPTON} $(SRCDIR)/dhry_1.o $(SRCDIR)/dhry_2.o
 	cd $(SRCDIR); rm -f dhry_1.o dhry_2.o
 $(PROGDIR)/dhry2reg: $(SRCDIR)/dhry_1.c $(SRCDIR)/dhry_2.c $(SRCDIR)/dhry.h
-	cd $(SRCDIR); $(CC) -c ${CFLAGS} -DREG=register -DHZ=${HZ} ${OPTON} dhry_1.c
-	cd $(SRCDIR); $(CC) -c ${CFLAGS} -DREG=register -DHZ=${HZ} ${OPTON} dhry_2.c
-	$(CC) -o $(PROGDIR)/dhry2reg ${CFLAGS} ${OPTON} $(SRCDIR)/dhry_1.o $(SRCDIR)/dhry_2.o
-	cd $(SRCDIR); rm -f dhry_1.o dhry_2.o
+	cd $(SRCDIR); $(CC) -c ${CFLAGS} -DREG=register -DHZ=${HZ} ${OPTON} dhry_1.c -o dhry_1_reg.o
+	cd $(SRCDIR); $(CC) -c ${CFLAGS} -DREG=register -DHZ=${HZ} ${OPTON} dhry_2.c -o dhry_2_reg.o
+	$(CC) -o $(PROGDIR)/dhry2reg ${CFLAGS} ${OPTON} $(SRCDIR)/dhry_1_reg.o $(SRCDIR)/dhry_2_reg.o
+	cd $(SRCDIR); rm -f dhry_1_reg.o dhry_2_reg.o
 
 $(PROGDIR)/looper: $(SRCDIR)/looper.c
 	$(CC) -o $(PROGDIR)/looper ${CFLAGS} ${OPTON} $(SRCDIR)/looper.c

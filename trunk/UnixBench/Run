@@ -8,7 +8,7 @@ use IO::Handle;
 
 
 ############################################################################
-#  UnixBench - Release 5.1.1, based on:
+#  UnixBench - Release 5.1.3, based on:
 #  The BYTE UNIX Benchmarks - Release 3
 #          Module: Run   SID: 3.11 5/15/91 19:30:14
 # Original Byte benchmarks written by:
@@ -55,6 +55,7 @@ use IO::Handle;
 # 2007.10.12    IS      Added graphics tests, categories feature.
 # 2007.10.14    IS      Set and report LANG.  Added "grep" and "sysexec".
 # 2007.12.22    IS      Tiny fixes; see README.
+# 2011.01.13    KDL     Fix for parallel compilation.
 
 
 ############################################################################
@@ -62,7 +63,7 @@ use IO::Handle;
 ############################################################################
 
 # Version number of the script.
-my $version = "5.1.2";
+my $version = "5.1.3";
 
 # The setting of LANG makes a huge difference to some of the scores,
 # particularly depending on whether UTF-8 is used.  So we always set
