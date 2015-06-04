@@ -30,13 +30,13 @@ by running the code on a benchmark system, which is a SPARCstation 20-61 (rated 
 and produced <b>UnixBench 4</b>. He later gave the program to <em>Ian Smith</em> to maintain. Ian subsequently made 
 some major changes and revised it from version 4 to version 5.
 
-Thanks to Ian Smith for managing the release up to 5.1.3.  As of the next release Anthony F. Voellm is going to help maintain the code base.  The releases will happen once there are enough pull requests to warrent a new release.<p>
+Thanks to Ian Smith for managing the release up to 5.1.3.  As of the next release (5.2) Anthony F. Voellm is going to help maintain the code base.  The releases will happen once there are enough pull requests to warrent a new release.<p>
 
 The general process will be the following:
 <ul>
 <li> Open a bug annoucing a new release will happen.
 <li> Everything of the dev branch will be run.
-<li> Code will move from the dev branch into main and be labeled.  Bug fix releases with increment the subversion and major functionality changes will increase the major version.
+<li> Code will move from the dev branch into main and be tagged.  Bug fix releases with increment the subversion and major functionality changes will increase the major version.
 </ul>
 
 <h2>Included Tests</h2>
