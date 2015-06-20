@@ -27,6 +27,7 @@ char SCCSid[] = "@(#) @(#)context1.c:3.3 -- 5/15/91 19:30:18";
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <string.h>
 #include "timeit.c"
 
 unsigned long iter;
@@ -91,6 +92,9 @@ char	*argv[];
 		close(p1[1]); close(p2[0]);
 		while (1) {
 			if (read(p1[0], (char *)&check, sizeof(check)) != sizeof(check)) {
+				if (errno == EINVAL || errno == ENOENT) {
+					exit(0);
+				}
 				if ((errno != 0) && (errno != EINTR))
 					perror("slave read failed");
 				exit(1);
@@ -101,6 +105,9 @@ char	*argv[];
 				exit(2);
 			}
 			if (write(p2[1], (char *)&iter1, sizeof(iter1)) != sizeof(check)) {
+				if (errno == EINVAL || errno == ENOENT) {
+					exit(0);
+				}
 				if ((errno != 0) && (errno != EINTR))
 					perror("slave write failed");
 				exit(1);
