@@ -72,3 +72,7 @@ This estimates the cost of entering and leaving the operating system kernel, i.e
 
 <h3>Graphical Tests</h3>
 Both 2D and 3D graphical tests are provided; at the moment, the 3D suite in particular is very limited, consisting of the "ubgears" program. These tests are intended to provide a very rough idea of the system's 2D and 3D graphics performance. Bear in mind, of course, that the reported performance will depend not only on hardware, but on whether your system has appropriate drivers for it.
+
+# License
+
+This project is released under the [GPL v2](LICENSE.txt) license.
