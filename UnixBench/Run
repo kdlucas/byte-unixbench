@@ -672,30 +672,48 @@ sub processCpuFlags {
 # these fields:
 # describing the model etc.  Returns undef if the information can't be got.
 sub getCpuInfo {
-    open(my $fd, "<", "/proc/cpuinfo") || return undef;
-
-    my $cpus = [ ];
-    my $cpu = 0;
-    while (<$fd>) {
-        chomp;
-        my ( $field, $val ) = split(/[ \t]*:[ \t]*/);
-        next if (!$field || !$val);
-        if ($field eq "processor") {
-            $cpu = $val;
-        } elsif ($field eq "model name") {
-            my $model = $val;
-            $model =~ s/  +/ /g;
-            $cpus->[$cpu]{'model'} = $model;
-        } elsif ($field eq "bogomips") {
-            $cpus->[$cpu]{'bogo'} = $val;
-        } elsif ($field eq "flags") {
-            $cpus->[$cpu]{'flags'} = processCpuFlags($val);
+    if (!("$^O" eq "darwin")) {
+        open(my $fd, "<", "/proc/cpuinfo") || return undef;
+        
+        my $cpus = [ ];
+        my $cpu = 0;
+        while (<$fd>) {
+            chomp;
+            my ( $field, $val ) = split(/[ \t]*:[ \t]*/);
+            next if (!$field || !$val);
+            if ($field eq "processor") {
+                $cpu = $val;
+            } elsif ($field eq "model name") {
+                my $model = $val;
+                $model =~ s/  +/ /g;
+                $cpus->[$cpu]{'model'} = $model;
+            } elsif ($field eq "bogomips") {
+                $cpus->[$cpu]{'bogo'} = $val;
+            } elsif ($field eq "flags") {
+                $cpus->[$cpu]{'flags'} = processCpuFlags($val);
+            }
         }
+
+        close($fd);
+
+        $cpus;
+
+    } else {
+
+        my $model = getCmdOutput("sysctl -n machdep.cpu.brand_string");
+        my $flags = getCmdOutput("sysctl -n machdep.cpu.features | tr [A-Z] [a-z]");
+        my $ncpu  = getCmdOutput("sysctl -n hw.ncpu");
+
+        my $cpus = [ ];
+        my $cpu = 0;
+
+        for ($cpu = 0; $cpu < $ncpu; $cpu++) {
+            $cpus->[$cpu]{'model'} = $model;
+            $cpus->[$cpu]{'bogo'}  = 0;
+            $cpus->[$cpu]{'flags'} = processCpuFlags($flags);
+        }
+        $cpus;
     }
-
-    close($fd);
-
-    $cpus;
 }
 
 
@@ -723,7 +741,7 @@ sub getSystemInfo {
     $info->{'osRel'} = getCmdOutput("uname -r");
     $info->{'osVer'} = getCmdOutput("uname -v");
     $info->{'mach'} = getCmdOutput("uname -m");
-    $info->{'platform'} = getCmdOutput("uname -i");
+    $info->{'platform'} = getCmdOutput("uname -i") || "unknown";
 
     # Get the system name (SUSE, Red Hat, etc.) if possible.
     $info->{'system'} = $info->{'os'};
@@ -735,9 +753,9 @@ sub getSystemInfo {
 
     # Get the language info.
     my $lang = getCmdOutput("printenv LANG");
-    my $map = getCmdOutput("locale -k LC_CTYPE | grep charmap");
+    my $map = getCmdOutput("locale -k LC_CTYPE | grep charmap") || "";
     $map =~ s/.*=//;
-    my $coll = getCmdOutput("locale -k LC_COLLATE | grep collate-codeset");
+    my $coll = getCmdOutput("locale -k LC_COLLATE | grep collate-codeset") || "";
     $coll =~ s/.*=//;
     $info->{'language'} = sprintf "%s (charmap=%s, collate=%s)",
                                    $lang, $map, $coll;
@@ -753,7 +771,7 @@ sub getSystemInfo {
     $info->{'graphics'} = getCmdOutput("3dinfo | cut -f1 -d\'(\'");
 
     # Get system run state, load and usage info.
-    $info->{'runlevel'} = getCmdOutput("runlevel | cut -f2 -d\" \"");
+    $info->{'runlevel'} = getCmdOutput("who -r | awk '{print \$3}'");
     $info->{'load'} = getCmdOutput("uptime");
     $info->{'numUsers'} = getCmdOutput("who | wc -l");
 

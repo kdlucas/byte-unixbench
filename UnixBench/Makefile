@@ -58,7 +58,7 @@ CC=gcc
 # OPTIMISATION SETTINGS:
 
 ## Very generic
-#OPTON = -O
+OPTON = -O -Wall
 
 ## For Linux 486/Pentium, GCC 2.7.x and 2.8.x
 #OPTON = -O2 -fomit-frame-pointer -fforce-addr -fforce-mem -ffast-math \
@@ -71,7 +71,7 @@ CC=gcc
 #	-m386 -malign-loops=1 -malign-jumps=1 -malign-functions=1
 
 ## For Solaris 2, or general-purpose GCC 2.7.x
-OPTON = -O2 -fomit-frame-pointer -fforce-addr -ffast-math -Wall
+#OPTON = -O2 -fomit-frame-pointer -fforce-addr -ffast-math -Wall
 
 ## For Digital Unix v4.x, with DEC cc v5.x
 #OPTON = -O4
