@@ -45,9 +45,6 @@
 #define MAXCHILD	12
 #define MAXWORK		10
 
-/* Can't seem to get this declared in the headers... */
-extern int kill(pid_t pid, int sig);
-
 void	wrapup(const char *);
 void	onalarm(int);
 void	pipeerr();

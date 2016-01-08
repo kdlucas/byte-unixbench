@@ -376,9 +376,6 @@ char	*argv[];
     struct poll2ofd poll2ofd_array[MAX_FDS];
     long poll2_times[MAX_ITERATIONS];
 #endif
-#if 0
-    extern char *sys_errlist[];
-#endif
 
 #ifdef HAS_SELECT
     FD_ZERO (&input_fds);
