@@ -48,7 +48,7 @@
 /* Can't seem to get this declared in the headers... */
 extern int kill(pid_t pid, int sig);
 
-void	wrapup(char *);
+void	wrapup(const char *);
 void	onalarm(int);
 void	pipeerr();
 void	grunt();
@@ -56,7 +56,7 @@ void getwork(void);
 #if debug
 void dumpwork(void);
 #endif
-void fatal(char *s);
+void fatal(const char *s);
 
 float	thres;
 float	est_rate = DEF_RATE;
@@ -420,7 +420,7 @@ void pipeerr()
 	sigpipe++;
 }
 
-void wrapup(char *reason)
+void wrapup(const char *reason)
 {
     int i;
     int killed = 0;
@@ -449,7 +449,6 @@ void getwork(void)
     char		*q = (void *)0;
     struct st_work	*w = (void *)0;
     char		line[MAXLINE];
-    char		c;
 
     while (fgets(line, MAXLINE, stdin) != NULL) {
 	if (nwork >= MAXWORK) {
@@ -492,7 +491,6 @@ void getwork(void)
 		/* standard input for this job */
 		q = ++lp;
 		while (*lp && *lp != ' ') lp++;
-		c = *lp;
 		*lp = '\0';
 		if ((f = open(q, 0)) == -1) {
 		    fprintf(stderr, "cannot open input file (%s) for job %d\n",
@@ -580,10 +578,10 @@ void dumpwork(void)
 }
 #endif
 
-void fatal(char *s)
+void fatal(const char *s)
 {
     int	i;
-    fprintf(stderr, s);
+    fprintf(stderr, "%s", s);
     fflush(stderr);
     perror("Reason?");
     fflush(stderr);
