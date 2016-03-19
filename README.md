@@ -62,7 +62,7 @@ This measures the rate at which data can be transferred from one file to another
 
 ### Pipe Throughput
 
-A pipe is the simplest form of communication between processes. Pipe throughtput is the number of times (per second) a process can write 512 bytes to a pipe and read them back. The pipe throughput test has no real counterpart in real-world programming.
+A pipe is the simplest form of communication between processes. Pipe throughput is the number of times (per second) a process can write 512 bytes to a pipe and read them back. The pipe throughput test has no real counterpart in real-world programming.
 
 ### Pipe-based Context Switching
 
@@ -74,7 +74,7 @@ This test measure the number of times a process can fork and reap a child that i
 
 ### Shell Scripts
 
-The shells scripts test measures the number of times per minute a process can start and reap a set of one, two, four and eight concurrent copies of a shell scripts where the shell script applies a series of transofrmation to a data file.
+The shells scripts test measures the number of times per minute a process can start and reap a set of one, two, four and eight concurrent copies of a shell scripts where the shell script applies a series of transformation to a data file.
 
 ### System Call Overhead
 
