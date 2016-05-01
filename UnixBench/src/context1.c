@@ -44,6 +44,7 @@ char	*argv[];
 	int duration;
 	unsigned long	check;
 	int	p1[2], p2[2];
+	ssize_t ret;
 
 	if (argc != 2) {
 		fprintf(stderr, "Usage: context duration\n");
@@ -70,8 +71,8 @@ char	*argv[];
 					perror("master write failed");
 				exit(1);
 			}
-			if (read(p2[0], (char *)&check, sizeof(check)) != sizeof(check)) {
-				if ((errno != 0) && (errno != EINTR))
+			if ((ret = read(p2[0], (char *)&check, sizeof(check))) != sizeof(check)) {
+				if ((ret == -1) && (errno != 0) && (errno != EINTR))
 					perror("master read failed");
 				exit(1);
 			}
@@ -90,8 +91,8 @@ char	*argv[];
 		/* slave, read p1 & write p2 */
 		close(p1[1]); close(p2[0]);
 		while (1) {
-			if (read(p1[0], (char *)&check, sizeof(check)) != sizeof(check)) {
-				if ((errno != 0) && (errno != EINTR))
+			if ((ret = read(p1[0], (char *)&check, sizeof(check))) != sizeof(check)) {
+				if ((ret == -1) && (errno != 0) && (errno != EINTR))
 					perror("slave read failed");
 				exit(1);
 			}

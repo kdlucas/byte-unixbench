@@ -51,8 +51,6 @@ char SCCSid[] = "@(#) @(#)fstime.c:3.5 -- 5/15/91 19:30:19";
 #define FNAME0  "dummy0"
 #define FNAME1  "dummy1"
 
-extern void sync(void);
-
 int w_test(int timeSecs);
 int r_test(int timeSecs);
 int c_test(int timeSecs);
@@ -318,7 +316,6 @@ int r_test(int timeSecs)
         unsigned long tmp;
         double start, end;
         extern int sigalarm;
-        extern int errno;
 
         /* Sync and let it settle */
         sync();
