@@ -241,7 +241,7 @@ $(PROGDIR)/select:   $(SRCDIR)/time-polling.c
 $(PROGDIR)/select:   CFLAGS += -DUNIXBENCH -DHAS_SELECT
 
 $(PROGDIR)/whetstone-double: $(SRCDIR)/whets.c
-$(PROGDIR)/whetstone-double: CFLAGS += -DDP -DUNIX -DUNIXBENCH
+$(PROGDIR)/whetstone-double: CFLAGS += -DDP -DGTODay -DUNIXBENCH
 $(PROGDIR)/whetstone-double: LDFLAGS += -lm
 
 $(PROGDIR)/pipe: $(SRCDIR)/pipe.c $(SRCDIR)/timeit.c
