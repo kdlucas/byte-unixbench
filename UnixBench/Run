@@ -5,6 +5,7 @@ use strict;
 use POSIX qw(strftime);
 use Time::HiRes;
 use IO::Handle;
+use FindBin;
 
 
 ############################################################################
@@ -83,21 +84,19 @@ my $cCompiler = 'gcc';
 
 # Establish full paths to directories.  These need to be full pathnames
 # (or do they, any more?).  They can be set in env.
-# variables whose names are the first parameter to getDir() below.
-my $BASEDIR = `pwd`;
-chomp($BASEDIR);
+# variable names are the first parameter to getDir() below.
 
 # Directory where the test programs live.
-my $BINDIR = getDir('UB_BINDIR', $BASEDIR . "/pgms");
+my $BINDIR = getDir('UB_BINDIR', $FindBin::Bin . "/pgms");
 
 # Temp directory, for temp files.
-my $TMPDIR = getDir('UB_TMPDIR', $BASEDIR . "/tmp");
+my $TMPDIR = getDir('UB_TMPDIR', $FindBin::Bin . "/tmp");
 
 # Directory to put results in.
-my $RESULTDIR = getDir('UB_RESULTDIR', $BASEDIR . "/results");
+my $RESULTDIR = getDir('UB_RESULTDIR', $FindBin::Bin . "/results");
 
 # Directory where the tests are executed.
-my $TESTDIR = getDir('UB_TESTDIR', $BASEDIR . "/testdir");
+my $TESTDIR = getDir('UB_TESTDIR', $FindBin::Bin . "/testdir");
 
 
 ############################################################################
