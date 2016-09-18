@@ -670,6 +670,9 @@ sub processCpuFlags {
 # array of N entries, one per CPU, where each entry is a hash containing
 # these fields:
 # describing the model etc.  Returns undef if the information can't be got.
+#
+# future: on systems without /proc/cpuinfo, might check for Perl modules:
+#   Sys::Info::Device::CPU or Sys::CpuAffinity
 sub getCpuInfo {
     if (!("$^O" eq "darwin")) {
         open(my $fd, "<", "/proc/cpuinfo") || return undef;
@@ -713,6 +716,39 @@ sub getCpuInfo {
         }
         $cpus;
     }
+}
+
+
+# Get number of available (active) CPUs (not including disabled CPUs)
+# or, if not num of available CPUs, the total number of CPUs on the system
+# Returns undef if the information can't be obtained.
+#
+# There is no shortage of platform-specific methods to obtain this info.
+# This routine -is not- exhaustive, but adds some additional portability.
+# Most modern unix systems implement sysconf(_SC_NPROCESSORS_ONLN).
+sub getNumActiveCpus {
+    my $numCpus;
+
+    #(POSIX::_SC_NPROCESSORS_ONLN value not typically provided by POSIX.pm)
+    #$numCpus = POSIX::sysconf(POSIX::_SC_NPROCESSORS_ONLN);
+    #if (defined($numCpus)) { chomp $numCpus; return $numCpus if $numCpus; }
+
+    $numCpus = `getconf _NPROCESSORS_ONLN 2>/dev/null`;
+    if (defined($numCpus)) { chomp $numCpus; return $numCpus if $numCpus; }
+
+    $numCpus = `getconf NPROCESSORS_ONLN 2>/dev/null`;
+    if (defined($numCpus)) { chomp $numCpus; return $numCpus if $numCpus; }
+
+    $numCpus = `nproc 2>/dev/null`;
+    if (defined($numCpus)) { chomp $numCpus; return $numCpus if $numCpus; }
+
+    $numCpus = `python -c 'import os; print os.sysconf(os.sysconf_names["SC_NPROCESSORS_ONLN"]);' 2>/dev/null`;
+    if (defined($numCpus)) { chomp $numCpus; return $numCpus if $numCpus; }
+
+    # Windows
+    return $ENV{"NUMBER_OF_PROCESSORS"} if $ENV{"NUMBER_OF_PROCESSORS"};
+
+    return undef;
 }
 
 
@@ -764,6 +800,12 @@ sub getSystemInfo {
     if (defined($cpus)) {
         $info->{'cpus'} = $cpus;
         $info->{'numCpus'} = scalar(@$cpus);
+    }
+
+    # Get available number of CPUs (not disabled CPUs), if possible.
+    my $numCpus = getNumActiveCpus();
+    if (defined($numCpus)) {
+        $info->{'numCpus'} = $numCpus; # overwrite value from getCpuinfo()
     }
 
     # Get graphics hardware info.
