@@ -947,12 +947,12 @@ sub combinePassResults {
 
         # If $timebase is 0 the figure is a rate; else compute
         # counts per $timebase.  $time is always seconds.
-        if ($timebase > 0) {
+        if ($timebase > 0 && $time > 0) {
             $sum += $count / ($time / $timebase);
-            $product += log($count) - log($time / $timebase);
+            $product += log($count) - log($time / $timebase) if ($count > 0);
         } else {
             $sum += $count;
-            $product += log($count);
+            $product += log($count) if ($count > 0);
         }
         $totalTime += $time;
     }
@@ -1030,7 +1030,7 @@ sub indexResults {
         $bresult->{'index'} = $ratio * 10;
 
         # Sun the scores, and count this test for this category.
-        $sum->{$cat} += log($ratio);
+        $sum->{$cat} += log($ratio) if ($ratio > 0.000001);
         ++$indexed->{$cat};
     }
 
