@@ -56,6 +56,7 @@ char	*argv[];
 	/* set up alarm call */
 	iter = 0;
 	wake_me(duration, report);
+	signal(SIGPIPE, SIG_IGN);
 
 	if (pipe(p1) || pipe(p2)) {
 		perror("pipe create failed");
@@ -66,12 +67,20 @@ char	*argv[];
 		/* master, write p1 & read p2 */
 		close(p1[0]); close(p2[1]);
 		while (1) {
-			if (write(p1[1], (char *)&iter, sizeof(iter)) != sizeof(iter)) {
-				if ((errno != 0) && (errno != EINTR))
+			if ((ret = write(p1[1], (char *)&iter, sizeof(iter))) != sizeof(iter)) {
+				if ((ret == -1) && (errno == EPIPE)) {
+					alarm(0);
+					report(); /* does not return */
+				}
+				if ((ret == -1) && (errno != 0) && (errno != EINTR))
 					perror("master write failed");
 				exit(1);
 			}
 			if ((ret = read(p2[0], (char *)&check, sizeof(check))) != sizeof(check)) {
+				if ((ret == 0)) { /* end-of-stream */
+					alarm(0);
+					report(); /* does not return */
+				}
 				if ((ret == -1) && (errno != 0) && (errno != EINTR))
 					perror("master read failed");
 				exit(1);
@@ -92,6 +101,10 @@ char	*argv[];
 		close(p1[1]); close(p2[0]);
 		while (1) {
 			if ((ret = read(p1[0], (char *)&check, sizeof(check))) != sizeof(check)) {
+				if ((ret == 0)) { /* end-of-stream */
+					alarm(0);
+					report(); /* does not return */
+				}
 				if ((ret == -1) && (errno != 0) && (errno != EINTR))
 					perror("slave read failed");
 				exit(1);
@@ -101,8 +114,12 @@ char	*argv[];
 					iter, check);
 				exit(2);
 			}
-			if (write(p2[1], (char *)&iter1, sizeof(iter1)) != sizeof(check)) {
-				if ((errno != 0) && (errno != EINTR))
+			if ((ret = write(p2[1], (char *)&iter1, sizeof(iter1))) != sizeof(check)) {
+				if ((ret == -1) && (errno == EPIPE)) {
+					alarm(0);
+					report(); /* does not return */
+				}
+				if ((ret == -1) && (errno != 0) && (errno != EINTR))
 					perror("slave write failed");
 				exit(1);
 			}
