@@ -103,6 +103,7 @@ char	*argv[];
 			if ((ret = read(p1[0], (char *)&check, sizeof(check))) != sizeof(check)) {
 				if ((ret == 0)) { /* end-of-stream */
 					alarm(0);
+					iter = iter1;
 					report(); /* does not return */
 				}
 				if ((ret == -1) && (errno != 0) && (errno != EINTR))
@@ -117,6 +118,7 @@ char	*argv[];
 			if ((ret = write(p2[1], (char *)&iter1, sizeof(iter1))) != sizeof(check)) {
 				if ((ret == -1) && (errno == EPIPE)) {
 					alarm(0);
+					iter = iter1;
 					report(); /* does not return */
 				}
 				if ((ret == -1) && (errno != 0) && (errno != EINTR))
