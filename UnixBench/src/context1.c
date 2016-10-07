@@ -94,38 +94,33 @@ char	*argv[];
 		}
 	}
 	else { /* child process */
-		unsigned long iter1;
-
-		iter1 = 0;
 		/* slave, read p1 & write p2 */
 		close(p1[1]); close(p2[0]);
 		while (1) {
 			if ((ret = read(p1[0], (char *)&check, sizeof(check))) != sizeof(check)) {
 				if ((ret == 0)) { /* end-of-stream */
 					alarm(0);
-					iter = iter1;
 					report(); /* does not return */
 				}
 				if ((ret == -1) && (errno != 0) && (errno != EINTR))
 					perror("slave read failed");
 				exit(1);
 			}
-			if (check != iter1) {
+			if (check != iter) {
 				fprintf(stderr, "Slave sync error: expect %lu, got %lu\n",
 					iter, check);
 				exit(2);
 			}
-			if ((ret = write(p2[1], (char *)&iter1, sizeof(iter1))) != sizeof(check)) {
+			if ((ret = write(p2[1], (char *)&iter, sizeof(iter))) != sizeof(check)) {
 				if ((ret == -1) && (errno == EPIPE)) {
 					alarm(0);
-					iter = iter1;
 					report(); /* does not return */
 				}
 				if ((ret == -1) && (errno != 0) && (errno != EINTR))
 					perror("slave write failed");
 				exit(1);
 			}
-			iter1++;
+			iter++;
 		}
 	}
 }
