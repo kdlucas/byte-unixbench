@@ -99,7 +99,7 @@ endif
 
 
 ## generic gcc CFLAGS.  -DTIME must be included.
-CFLAGS = -Wall -pedantic $(OPTON) -I $(SRCDIR) -DTIME
+CFLAGS += -Wall -pedantic $(OPTON) -I $(SRCDIR) -DTIME
 
 
 ##############################################################################
