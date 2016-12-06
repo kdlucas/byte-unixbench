@@ -13,9 +13,9 @@ Multi-CPU systems are handled. If your system has multiple CPUs, the default beh
 twice -- once with one copy of each test program running at a time, and once with N copies, where N is the number of 
 CPUs. This is designed to allow you to assess:
 
-* the performance of your system when running a single task
-* the performance of your system when running multiple tasks
-* the gain from your system's implementation of parallel processing
+* The performance of your system when running a single task
+* The performance of your system when running multiple tasks
+* The gain from your system's implementation of parallel processing
 
 Do be aware that this is a system benchmark, not a CPU, RAM or disk benchmark. The results will depend not only on 
 your hardware, but on your operating system, libraries, and even compiler.
