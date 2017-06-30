@@ -775,7 +775,9 @@ sub getSystemInfo {
     $info->{'os'} = getCmdOutput("uname -o") || getCmdOutput("uname -s");
     $info->{'osRel'} = getCmdOutput("uname -r");
     $info->{'osVer'} = getCmdOutput("uname -v");
-    $info->{'mach'} = getCmdOutput("uname -m");
+    $info->{'mach'} = $^O ne "aix"
+      ? getCmdOutput("uname -m")
+      : getCmdOutput("uname -p");
     $info->{'platform'} = getCmdOutput("uname -i") || "unknown";
 
     # Get the system name (SUSE, Red Hat, etc.) if possible.
@@ -788,9 +790,13 @@ sub getSystemInfo {
 
     # Get the language info.
     my $lang = getCmdOutput("printenv LANG");
-    my $map = getCmdOutput("locale -k LC_CTYPE | grep charmap") || "";
+    my $map = $^O ne "aix"
+      ? getCmdOutput("locale -k LC_CTYPE | grep charmap") || ""
+      : getCmdOutput("locale charmap") || "";
     $map =~ s/.*=//;
-    my $coll = getCmdOutput("locale -k LC_COLLATE | grep collate-codeset") || "";
+    my $coll = $^O ne "aix"
+      ? getCmdOutput("locale -k LC_COLLATE | grep collate-codeset") || ""
+      : getCmdOutput("locale | grep LC_COLLATE") || "";
     $coll =~ s/.*=//;
     $info->{'language'} = sprintf "%s (charmap=%s, collate=%s)",
                                    $lang, $map, $coll;
@@ -844,11 +850,12 @@ sub preChecks {
     $ENV{'LANG'} = $language;
 
     # Check that the required files are in the proper places.
-    system("make check");
+    my $make = $ENV{MAKE} || "make";
+    system("$make check");
     if ($? != 0) {
-        system("make all");
+        system("$make all");
         if ($? != 0) {
-            abortRun("\"make all\" failed");
+            abortRun("\"$make all\" failed");
         }
     }
 
