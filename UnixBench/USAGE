@@ -65,6 +65,8 @@ so that randomly-churning background processes don't randomise the results
 too much.  This is particularly true for the graphics tests.
 
 
+If you need to change the directories, use "Environment variables" about below.
+  * "UB_OUTPUT_CSV"       : If set "true", output results(score only) to .csv.
 ============================================================================
 
 Tests
