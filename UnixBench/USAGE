@@ -65,6 +65,11 @@ so that randomly-churning background processes don't randomise the results
 too much.  This is particularly true for the graphics tests.
 
 
+If you need to change the directories, use "Environment variables" about below.
+
+  * "UB_RESULTDIR"        : Output destination path(absolute) of the result files.
+  * "UB_TMPDIR"           : Directory path(absolute) used for file I/O tests(named fs****).
+  * "UB_OUTPUT_FILE_NAME" : Output file name. If exists same file, it will be overwrite completly.
 ============================================================================
 
 Tests
