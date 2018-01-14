@@ -58,43 +58,52 @@ GL_LIBS = -lGL -lXext -lX11
 CC=gcc
 
 # OPTIMISATION SETTINGS:
+# Use gcc option if defined UB_GCC_OPTIONS via "Environment variable" or "Command-line arguments".
+ifdef UB_GCC_OPTIONS
+  OPTON = $(UB_GCC_OPTIONS)
 
-## Very generic
-#OPTON = -O
+else
+  ## Very generic
+  #OPTON = -O
 
-## For Linux 486/Pentium, GCC 2.7.x and 2.8.x
-#OPTON = -O2 -fomit-frame-pointer -fforce-addr -fforce-mem -ffast-math \
-#	-m486 -malign-loops=2 -malign-jumps=2 -malign-functions=2
+  ## For Linux 486/Pentium, GCC 2.7.x and 2.8.x
+  #OPTON = -O2 -fomit-frame-pointer -fforce-addr -fforce-mem -ffast-math \
+  #	-m486 -malign-loops=2 -malign-jumps=2 -malign-functions=2
 
-## For Linux, GCC previous to 2.7.0
-#OPTON = -O2 -fomit-frame-pointer -fforce-addr -fforce-mem -ffast-math -m486
+  ## For Linux, GCC previous to 2.7.0
+  #OPTON = -O2 -fomit-frame-pointer -fforce-addr -fforce-mem -ffast-math -m486
 
-#OPTON = -O2 -fomit-frame-pointer -fforce-addr -fforce-mem -ffast-math \
-#	-m386 -malign-loops=1 -malign-jumps=1 -malign-functions=1
+  #OPTON = -O2 -fomit-frame-pointer -fforce-addr -fforce-mem -ffast-math \
+  #	-m386 -malign-loops=1 -malign-jumps=1 -malign-functions=1
 
-## For Solaris 2, or general-purpose GCC 2.7.x
-#OPTON = -O2 -fomit-frame-pointer -fforce-addr -ffast-math -Wall
+  ## For Solaris 2, or general-purpose GCC 2.7.x
+  #OPTON = -O2 -fomit-frame-pointer -fforce-addr -ffast-math -Wall
 
-## For Digital Unix v4.x, with DEC cc v5.x
-#OPTON = -O4
-#CFLAGS = -DTIME -std1 -verbose -w0
+  ## For Digital Unix v4.x, with DEC cc v5.x
+  #OPTON = -O4
+  #CFLAGS = -DTIME -std1 -verbose -w0
 
-## gcc optimization flags
-## (-ffast-math) disables strict IEEE or ISO rules/specifications for math funcs
-OPTON = -O3 -ffast-math
+  ## gcc optimization flags
+  ## (-ffast-math) disables strict IEEE or ISO rules/specifications for math funcs
+  OPTON = -O3 -ffast-math
 
-## OS detection.  Comment out if gmake syntax not supported by other 'make'.
-OSNAME:=$(shell uname -s)
+  ## OS detection.  Comment out if gmake syntax not supported by other 'make'. 
+  OSNAME:=$(shell uname -s)
+  ifeq ($(OSNAME),Linux)
+    # Not all CPU architectures support "-march" or "-march=native".
+    #   - Supported    : x86, x86_64, ARM, AARCH64, etc..
+    #   - Not Supported: RISC-V, IBM Power, etc...
+    OPTON += -march=native -mtune=native
+  endif
 
-ifeq ($(OSNAME),Linux)
-OPTON += -march=native -mtune=native
-endif
-ifeq ($(OSNAME),Darwin)
-# (adjust flags or comment out this section for older versions of XCode or OS X)
-# (-mmacosx-versin-min= requires at least that version of SDK be installed)
-OPTON += -march=native -mmacosx-version-min=10.10
-#http://stackoverflow.com/questions/9840207/how-to-use-avx-pclmulqdq-on-mac-os-x-lion/19342603#19342603
-CFLAGS += -Wa,-q
+  ifeq ($(OSNAME),Darwin)
+    # (adjust flags or comment out this section for older versions of XCode or OS X)
+    # (-mmacosx-versin-min= requires at least that version of SDK be installed)
+    OPTON += -march=native -mmacosx-version-min=10.10
+    #http://stackoverflow.com/questions/9840207/how-to-use-avx-pclmulqdq-on-mac-os-x-lion/19342603#19342603
+    CFLAGS += -Wa,-q
+  endif
+
 endif
 
 

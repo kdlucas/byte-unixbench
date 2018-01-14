@@ -1585,6 +1585,48 @@ sub summarizeRun {
 }
 
 
+# Write CSV Headers.
+#   e.g.: "Concurrency,Dhrystone 2 using register variables,Double-Precision Whetstone"
+#       
+sub summarizeRunCsvHeader {
+    my ( $results, $reportFd ) = @_;
+
+    # First col is for Concurrency value.
+    printf $reportFd "Concurrency";
+
+    # Write CSV Headers of test.
+    foreach my $bench (@{$results->{'list'}}) {
+        my $bresult = $results->{$bench};
+        printf $reportFd ",%s", $bresult->{'msg'};
+    }
+    printf $reportFd "\n";
+}
+
+# Write CSV data rows per concurrency as "./Run -c 1 -c 2".
+#   e.g.: 1,33526940.9,3623.9
+#         2,30386997.8,3678.8
+#         4,31439797.3,3781.4
+#         8,32872262.9,3826.2
+sub summarizeRunCsvRows {
+    my ( $results, $reportFd) = @_;
+
+    # Write concurrency value.
+    printf $reportFd "%d", $results->{'copies'};
+    
+    # Write test results.
+    my $isFirstColumn = 1;
+    foreach my $bench (@{$results->{'list'}}) {
+        my $bresult = $results->{$bench};
+
+        printf $reportFd ",%.1f", $bresult->{'score'};
+        $isFirstColumn = 0;
+    }
+
+    printf $reportFd "\n";
+}
+
+
+
 ############################################################################
 # HTML REPORTS
 ############################################################################
@@ -1887,13 +1929,26 @@ sub main {
     # Generate unique file names for the report and log file.
     my $reportFile = logFile($systemInfo);
     my $reportHtml = $reportFile . ".html";
+    my $reportCsv = $reportFile . ".csv";
     my $logFile = $reportFile . ".log";
 
+    # If defined "UB_OUTPUT_CSV" on Environment, output csv file.
+    my $ubOutputCsv = $ENV{"UB_OUTPUT_CSV"};
+    my $isOutputFormatCsv = defined($ubOutputCsv) && $ubOutputCsv eq "true";
+    # If write CSV, header needs only once.
+    my $is_csv_header_written = 0;
+    
     # Open the log file for writing.
     open(my $reportFd, ">", $reportFile) ||
                             die("Run: can't write to $reportFile\n");
     open(my $reportFd2, ">", $reportHtml) ||
                             die("Run: can't write to $reportHtml\n");
+    my $reportFd_Csv;
+    if ($isOutputFormatCsv) {
+        open($reportFd_Csv, ">", $reportCsv) ||
+                            die("Run: can't write to $reportCsv\n");
+    }
+
     printf $reportFd "   BYTE UNIX Benchmarks (Version %s)\n\n", $version;
     runHeaderHtml($systemInfo, $reportFd2);
 
@@ -1912,6 +1967,14 @@ sub main {
 
         summarizeRun($systemInfo, $results, $verbose, $reportFd);
         summarizeRunHtml($systemInfo, $results, $verbose, $reportFd2);
+
+        if ($isOutputFormatCsv) {
+            if ( $is_csv_header_written == 0 ) {
+                summarizeRunCsvHeader($results, $reportFd_Csv);
+                $is_csv_header_written = 1;
+            }
+            summarizeRunCsvRows($results, $reportFd_Csv);
+        }
     }
 
     runFooterHtml($reportFd2);
@@ -1919,6 +1982,9 @@ sub main {
     # Finish the report.
     close($reportFd);
     close($reportFd2);
+    if ($isOutputFormatCsv) {
+        close($reportFd_Csv);
+    }
 
     # Display the report, if not in quiet mode.
     if ($verbose > 0) {
