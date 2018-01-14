@@ -65,7 +65,11 @@ so that randomly-churning background processes don't randomise the results
 too much.  This is particularly true for the graphics tests.
 
 
-If you need to change the directories, use "Environment variables" about below.
+Output can be specified by setting the following environment variables:
+
+  * "UB_RESULTDIR" : Absolute path of output directory of result files.
+  * "UB_TMPDIR" : Absolute path of temporary files for IO tests.
+  * "UB_OUTPUT_FILE_NAME" : Output file name. If exists it will be overwritten.
   * "UB_OUTPUT_CSV"       : If set "true", output results(score only) to .csv.
 ============================================================================
 

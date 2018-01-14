@@ -5,6 +5,7 @@ use strict;
 use POSIX qw(strftime);
 use Time::HiRes;
 use IO::Handle;
+use File::Path;
 use FindBin;
 
 
@@ -569,17 +570,33 @@ sub getCmdOutput {
 sub getDir {
     my ( $var, $def ) = @_;
 
+    # If Environment variables(e.g. UB_RESULTDIR) is unset, use default value.
     my $val = $ENV{$var} || $def;
 
-    # Canonicalise the value.
-    my $wd;
-    chomp($wd = `pwd`);
-    chdir($val);
-    chomp($val = `pwd`);
-    chdir($wd);
+    # Only "execl.c" test needs the Environment variable(UB_BINDIR).
     $ENV{$var} = $val;
 
-    $val;
+    return $val;
+}
+
+# Create direcotry(0755) if not exists.
+sub createDirrectoriesIfNotExists {
+    foreach my $path (@_) {
+        my $isDirectoryNotExists = ! -d $path;
+        if ( $isDirectoryNotExists ) {
+            mkpath($path, {chmod => 0755});
+        }
+    }
+}
+
+# Show use directories.
+sub printUsingDirectories {
+    printf "------------------------------------------------------------------------------\n";
+    printf "   Use directories for:\n";
+    printf "      * File I/O tests (named fs***) = ${TMPDIR}\n";
+    printf "      * Results                      = ${RESULTDIR}\n";
+    printf "------------------------------------------------------------------------------\n";
+    printf "\n";
 }
 
 
@@ -588,11 +605,18 @@ sub getDir {
 sub logFile {
     my ( $sysInfo ) = @_;
 
-    my $count = 1;
+    # If supplied output file name via Environment variable(UB_OUTPUT_FILE_NAME), then use it.
+    #   * If exists same file, it will be overwrite completly.
+    my $output_file_name_supplied_by_environment = $ENV{"UB_OUTPUT_FILE_NAME"};
+    if ( defined($output_file_name_supplied_by_environment) && $output_file_name_supplied_by_environment ne "" ) {
+        return ${RESULTDIR} . "/" . $output_file_name_supplied_by_environment;
+    }
+
 
     # Use the date in the base file name.
     my $ymd = strftime "%Y-%m-%d", localtime;
 
+    my $count = 1;
     while (1) {
         my $log = sprintf "%s/%s-%s-%02d",
                         ${RESULTDIR}, $sysInfo->{'name'}, $ymd, $count;
@@ -1872,6 +1896,10 @@ sub main {
         $tests = $index;
     }
 
+    # Create directories.    
+    my @creatingDirectories = ( ${TMPDIR}, ${RESULTDIR} );
+    createDirrectoriesIfNotExists(@creatingDirectories);
+
     preChecks();
     my $systemInfo = getSystemInfo();
 
@@ -1887,6 +1915,11 @@ sub main {
 
     # Display the program banner.
     system("cat \"${BINDIR}/unixbench.logo\"");
+
+    # Show output output directories, if not in quiet mode.
+    if ($verbose > 0) {
+        printUsingDirectories();
+    }
 
     if ($verbose > 1) {
         printf "\n", join(", ", @$tests);
