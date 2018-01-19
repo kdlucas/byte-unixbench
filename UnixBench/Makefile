@@ -89,17 +89,22 @@ else
 
   ## OS detection.  Comment out if gmake syntax not supported by other 'make'. 
   OSNAME:=$(shell uname -s)
+  ARCH := $(shell uname -p)
   ifeq ($(OSNAME),Linux)
     # Not all CPU architectures support "-march" or "-march=native".
     #   - Supported    : x86, x86_64, ARM, AARCH64, etc..
     #   - Not Supported: RISC-V, IBM Power, etc...
-    OPTON += -march=native -mtune=native
+    ifneq ($(ARCH),$(filter $(ARCH),ppc64 ppc64le))
+        OPTON += -march=native -mtune=native
+    endif
   endif
 
   ifeq ($(OSNAME),Darwin)
     # (adjust flags or comment out this section for older versions of XCode or OS X)
     # (-mmacosx-versin-min= requires at least that version of SDK be installed)
-    OPTON += -march=native -mmacosx-version-min=10.10
+    ifneq ($(ARCH),$(filter $(ARCH),ppc64 ppc64le))
+        OPTON += -march=native -mmacosx-version-min=10.10
+    endif
     #http://stackoverflow.com/questions/9840207/how-to-use-avx-pclmulqdq-on-mac-os-x-lion/19342603#19342603
     CFLAGS += -Wa,-q
   endif
