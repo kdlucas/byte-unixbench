@@ -96,6 +96,8 @@ else
     #   - Not Supported: RISC-V, IBM Power, etc...
     ifneq ($(ARCH),$(filter $(ARCH),ppc64 ppc64le))
         OPTON += -march=native -mtune=native
+    else
+        OPTON += -mcpu=native -mtune=native
     endif
   endif
 
@@ -104,6 +106,8 @@ else
     # (-mmacosx-versin-min= requires at least that version of SDK be installed)
     ifneq ($(ARCH),$(filter $(ARCH),ppc64 ppc64le))
         OPTON += -march=native -mmacosx-version-min=10.10
+    else
+        OPTON += -mcpu=native
     endif
     #http://stackoverflow.com/questions/9840207/how-to-use-avx-pclmulqdq-on-mac-os-x-lion/19342603#19342603
     CFLAGS += -Wa,-q
