@@ -65,7 +65,7 @@ char	*argv[];
         case 'm':
 	   while (1) {
 		close(dup(0));
-		getpid();
+		getppid();
 		getuid();
 		umask(022);
 		iter++;
@@ -79,7 +79,7 @@ char	*argv[];
            /* NOTREACHED */
         case 'g':
            while (1) {
-                getpid();
+                getppid();
                 iter++;
            }
            /* NOTREACHED */
