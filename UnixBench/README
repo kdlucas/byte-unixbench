@@ -1,4 +1,4 @@
-Version 5.1.3 -- 2011-01-13
+Version 5.1.4 -- 2018-07-02
 
 ================================================================
 To use Unixbench:
@@ -26,6 +26,12 @@ For information on adding tests into the benchmark, see "WRITING_TESTS".
 
 
 ===================== RELEASE NOTES =====================================
+
+========================  JUN 2 2018 ==========================
+v5.1.4
+Optimize contetxt1.c:
+Sometimes parent and child process will run on the same CPU, now we make parent process and child process run on different CPUs.
+
 
 ========================  Jan 13 ==========================
 
