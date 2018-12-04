@@ -1,6 +1,6 @@
 #! /bin/bash
 #==============================================================#
-#   Description:  Unixbench script, copy from :https://raw.githubusercontent.com/teddysun/across/master/unixbench.sh, change to v5.1.4   #
+#   Description:  Unixbench script, copy from :https://raw.githubusercontent.com/teddysun/across/master/unixbench.sh, change to v5.1.5   #
 #   Author: Teddysun <i@teddysun.com>                          #
 #   Intro:  https://teddysun.com/245.html                      #
 #==============================================================#
@@ -25,17 +25,17 @@ fi
 mkdir -p ${cur_dir}
 cd ${cur_dir}
 
-# Download UnixBench5.1.4
-if [ -s UnixBench-5.1.4.tar.gz ]; then
-    echo "UnixBench-5.1.4.tar.gz [found]"
+# Download UnixBench5.1.5
+if [ -s UnixBench-5.1.5.tar.gz ]; then
+    echo "UnixBench-5.1.5.tar.gz [found]"
 else
-    echo "UnixBench-5.1.4.tar.gz not found!!!download now..."
-    if ! wget -c https://github.com/aliyun/byte-unixbench/releases/download/v5.1.4/UnixBench-5.1.4.tar.gz; then
-        echo "Failed to download UnixBench-5.1.4.tar.gz, please download it to ${cur_dir} directory manually and try again."
+    echo "UnixBench-5.1.5.tar.gz not found!!!download now..."
+    if ! wget -c https://github.com/aliyun/byte-unixbench/releases/download/v5.1.5/UnixBench-5.1.5.tar.gz; then
+        echo "Failed to download UnixBench-5.1.5.tar.gz, please download it to ${cur_dir} directory manually and try again."
         exit 1
     fi
 fi
-tar -zxvf UnixBench-5.1.4.tar.gz && rm -f UnixBench-5.1.4.tar.gz
+tar -zxvf UnixBench-5.1.5.tar.gz && rm -f UnixBench-5.1.5.tar.gz
 cd UnixBench/
 
 #Run unixbench

@@ -747,6 +747,7 @@ char	*argv[];
 	 {
 	    for (ix=0; ix<xtra; ix++)
 	      {
+		x = 0.75;
 		for(i=0; i<n8; i++)
 		  {
 		     x = sqrt(exp(log(x)/t1));

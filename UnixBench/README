@@ -27,6 +27,11 @@ For information on adding tests into the benchmark, see "WRITING_TESTS".
 
 ===================== RELEASE NOTES =====================================
 
+v5.1.5
+Optimize whets.c:
+When the main frequency of the CPU is higher, the time of N8 process is nonlinear.
+More infomation, you can see: https://yq.aliyun.com/articles/674732
+
 ========================  JUN 2 2018 ==========================
 v5.1.4
 Optimize contetxt1.c:
