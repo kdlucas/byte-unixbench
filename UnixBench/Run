@@ -65,7 +65,7 @@ use FindBin;
 ############################################################################
 
 # Version number of the script.
-my $version = "5.1.3";
+my $version = "5.1.5";
 
 # The setting of LANG makes a huge difference to some of the scores,
 # particularly depending on whether UTF-8 is used.  So we always set
