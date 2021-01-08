@@ -1,4 +1,4 @@
-Version 5.1.3 -- 2011-01-13
+Version 5.1.6 -- 2021-01-08
 
 ================================================================
 To use Unixbench:
@@ -26,6 +26,33 @@ For information on adding tests into the benchmark, see "WRITING_TESTS".
 
 
 ===================== RELEASE NOTES =====================================
+
+v5.1.6
+Optimize syscall.c: Change getpid method to syscall
+According to http://man7.org/linux/man-pages/man2/getpid.2.html:
+
+From glibc version 2.3.4 up to and including version 2.24, the glibc
+wrapper function for getpid() cached PIDs, with the goal of avoiding
+additional system calls when a process calls getpid() repeatedly.
+
+So it's not suitable to messure the system call performance through
+getpid(). Directly call syscall(SYS_getpid) is more appropriate.
+
+From glibc version 2.25, cached pid is removed to fix some bugs which
+makes the testsuite wrongly report performance regression on system call.
+
+
+
+v5.1.5
+Optimize whets.c:
+When the main frequency of the CPU is higher, the time of N8 process is nonlinear.
+More infomation, you can see: https://yq.aliyun.com/articles/674732
+
+========================  JUN 2 2018 ==========================
+v5.1.4
+Optimize contetxt1.c:
+Sometimes parent and child process will run on the same CPU, now we make parent process and child process run on different CPUs.
+
 
 ========================  Jan 13 ==========================
 
