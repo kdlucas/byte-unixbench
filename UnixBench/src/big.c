@@ -100,7 +100,7 @@ char	*argv[];
     int		thiswork = 0;	/* next job stream to allocate */
     int		nch;		/* # characters to write */
     int		written;	/* # characters actully written */
-    char	logname[15];	/* name of the log file(s) */
+    char	logname[32];	/* name of the log file(s) */
     int		pvec[2];	/* for pipes */
     char	*p;
     char	*prog;		/* my name */
