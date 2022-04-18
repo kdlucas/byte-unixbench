@@ -794,7 +794,7 @@ char	*argv[];
       }
 
 
-    void pout(char title[18], float ops, int type, SPDP checknum,
+    void pout(char title[22], float ops, int type, SPDP checknum,
 	      SPDP time, int calibrate, int section)
       {
 	SPDP mops,mflops;
