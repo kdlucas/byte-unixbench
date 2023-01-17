@@ -29,6 +29,7 @@ char SCCSid[] = "@(#) @(#)syscall.c:3.3 -- 5/15/91 19:30:21";
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/syscall.h>
+#include <unistd.h>
 #include "timeit.c"
 
 unsigned long iter;
@@ -39,12 +40,23 @@ void report()
 	exit(0);
 }
 
+int create_fd()
+{
+	int fd[2];
+
+	if (pipe(fd) != 0 || close(fd[1]) != 0)
+	    exit(1);
+
+	return fd[0];
+}
+
 int main(argc, argv)
 int	argc;
 char	*argv[];
 {
         char   *test;
 	int	duration;
+	int	fd;
 
 	if (argc < 2) {
 		fprintf(stderr,"Usage: %s duration [ test ]\n", argv[0]);
@@ -64,8 +76,9 @@ char	*argv[];
 
         switch (test[0]) {
         case 'm':
+	   fd = create_fd();
 	   while (1) {
-		close(dup(0));
+		close(dup(fd));
 		syscall(SYS_getpid);
 		getuid();
 		umask(022);
@@ -73,8 +86,9 @@ char	*argv[];
 	   }
 	   /* NOTREACHED */
         case 'c':
+           fd = create_fd();
            while (1) {
-                close(dup(0));
+                close(dup(fd));
                 iter++;
            }
            /* NOTREACHED */
