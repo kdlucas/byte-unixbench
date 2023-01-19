@@ -312,7 +312,7 @@ structions
  void pa(SPDP e[4], SPDP t, SPDP t2);
  void po(SPDP e1[4], long j, long k, long l);
  void p3(SPDP *x, SPDP *y, SPDP *z, SPDP t, SPDP t1, SPDP t2);
- void pout(char title[22], float ops, int type, SPDP checknum,
+ void pout(char title[18], float ops, int type, SPDP checknum,
 		  SPDP time, int calibrate, int section);
 
 
@@ -794,7 +794,7 @@ char	*argv[];
       }
 
 
-    void pout(char title[22], float ops, int type, SPDP checknum,
+    void pout(char title[18], float ops, int type, SPDP checknum,
 	      SPDP time, int calibrate, int section)
       {
 	SPDP mops,mflops;
