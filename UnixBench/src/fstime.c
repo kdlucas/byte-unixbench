@@ -43,17 +43,13 @@ char SCCSid[] = "@(#) @(#)fstime.c:3.5 -- 5/15/91 19:30:19";
 #define SECONDS 10
 
 #define MAX_BUFSIZE 8192
-#define MAX_PATH 4096
 
 /* This must be set to the smallest BUFSIZE or 1024, whichever is smaller */
 #define COUNTSIZE 256
 #define HALFCOUNT (COUNTSIZE/2)         /* Half of COUNTSIZE */
 
-#define FNAME0  "dummy0"
-#define FNAME1  "dummy1"
-
-char file_f[MAX_PATH];
-char file_g[MAX_PATH];
+char FNAME0[] = "dummy0-XXXXXXXXXX";
+char FNAME1[] = "dummy1-XXXXXXXXXX";
 
 int w_test(int timeSecs);
 int r_test(int timeSecs);
@@ -175,26 +171,26 @@ char    *argv[];
     */
 
     int pid = getpid();
-    snprintf(file_f, MAX_PATH, "%s-%d", FNAME0, pid);
-    snprintf(file_g, MAX_PATH, "%s-%d", FNAME1, pid);
+    snprintf(FNAME0 + sizeof("dummy0"), sizeof(FNAME0) - sizeof("dummy0"), "%d", pid);
+    snprintf(FNAME1 + sizeof("dummy1"), sizeof(FNAME1) - sizeof("dummy1"), "%d", pid);
 
-    if((f = creat(file_f, 0600)) == -1) {
+    if((f = creat(FNAME0, 0600)) == -1) {
             perror("fstime: creat");
             exit(1);
     }
     close(f);
 
-    if((g = creat(file_g, 0600)) == -1) {
+    if((g = creat(FNAME1, 0600)) == -1) {
             perror("fstime: creat");
             exit(1);
     }
     close(g);
 
-    if( (f = open(file_f, 2)) == -1) {
+    if( (f = open(FNAME0, 2)) == -1) {
             perror("fstime: open");
             exit(1);
     }
-    if( ( g = open(file_g, 2)) == -1 ) {
+    if( ( g = open(FNAME1, 2)) == -1 ) {
             perror("fstime: open");
             exit(1);
     }
@@ -469,6 +465,6 @@ void stop_count(void)
 
 void clean_up(void)
 {
-        unlink(file_f);
-        unlink(file_g);
+        unlink(FNAME0);
+        unlink(FNAME1);
 }
