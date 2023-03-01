@@ -14,7 +14,8 @@
 #
 ###############################################################################
 ID="@(#)tst.sh:3.4 -- 5/15/91 19:30:24";
-sort >sort.$$ <sort.src
+sort_src_content=$(cat sort.src)
+printf "$sort_src_content%.0s\n" $(seq $1) | sort > sort.src.$$
 od sort.$$ | sort -n -k 1 > od.$$
 grep the sort.$$ | tee grep.$$ | wc > wc.$$
 rm sort.$$ grep.$$ od.$$ wc.$$

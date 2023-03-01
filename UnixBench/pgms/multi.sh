@@ -16,7 +16,7 @@
 ID="@(#)multi.sh:3.4 -- 5/15/91 19:30:24";
 instance=1
 while [ $instance -le $1 ]; do
-	/bin/sh "$UB_BINDIR/tst.sh" &
+	/bin/sh "$UB_BINDIR/tst.sh" 20 &
 	instance=$(($instance + 1))
 done
 wait
