@@ -16,10 +16,11 @@
 ID="@(#)multi.sh:3.4 -- 5/15/91 19:30:24";
 instance=1
 sort_src=sort.src
-times_of_sort_src=${TIMES_OF_SORT_SRC:-1}
-if [ $times_of_sort_src -gt 1 ]; then
-	for i in $(seq $times_of_sort_src); do combine_sort_src="$combine_sort_src $sort_src"; done
-	cat $combine_sort_src > sort.src-alt.$$
+work_factor=${MULTI_SH_WORK_FACTOR:-1}
+if [ $work_factor -gt 1 ]; then
+	inputs=
+	for i in $(seq $work_factor); do inputs="$inputs $sort_src"; done
+	cat $inputs > sort.src-alt.$$
 	sort_src=sort.src-alt.$$
 fi
 
@@ -29,7 +30,6 @@ while [ $instance -le $1 ]; do
 done
 wait
 
-if [ $times_of_sort_src -gt 1 ]; then
+if [ $work_factor -gt 1 ]; then
 	rm $sort_src
 fi
-
