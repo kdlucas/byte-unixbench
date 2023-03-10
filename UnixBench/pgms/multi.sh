@@ -15,9 +15,21 @@
 ###############################################################################
 ID="@(#)multi.sh:3.4 -- 5/15/91 19:30:24";
 instance=1
+sort_src=sort.src
+work_factor=${MULTI_SH_WORK_FACTOR:-1}
+if [ $work_factor -gt 1 ]; then
+	inputs=
+	for i in $(seq $work_factor); do inputs="$inputs $sort_src"; done
+	cat $inputs > sort.src-alt.$$
+	sort_src=sort.src-alt.$$
+fi
+
 while [ $instance -le $1 ]; do
-	/bin/sh "$UB_BINDIR/tst.sh" &
+	/bin/sh "$UB_BINDIR/tst.sh" $sort_src &
 	instance=$(($instance + 1))
 done
 wait
 
+if [ $work_factor -gt 1 ]; then
+	rm $sort_src
+fi

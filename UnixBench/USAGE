@@ -107,7 +107,13 @@ The following individual tests are available:
     fsdisk           File Copy 4096 bufsize 8000 maxblocks
     shell1           Shell Scripts (1 concurrent) (runs "looper 60 multi.sh 1")
     shell8           Shell Scripts (8 concurrent) (runs "looper 60 multi.sh 8")
-    shell16          Shell Scripts (8 concurrent) (runs "looper 60 multi.sh 16")
+    shell16          Shell Scripts (16 concurrent)(runs "looper 60 multi.sh 16")
+                       Environment variable MULTI_SH_WORK_FACTOR (default 1)
+                       can be set to multiply the size of test input data (~8k)
+                       Note: changing MULTI_SH_WORK_FACTOR modifies the test.
+                       However, modifying the user/kernel workload balance may
+                       be useful for comparison with other systems on which the
+                       benchmark was run using the same MULTI_SH_WORK_FACTOR.
 
   2d:
     2d-rects         2D graphics: rectangles
