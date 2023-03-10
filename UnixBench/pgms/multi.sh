@@ -18,7 +18,7 @@ instance=1
 sort_src=sort.src
 times_of_sort_src=${TIMES_OF_SORT_SRC:-1}
 if [ $times_of_sort_src -gt 1 ]; then
-	for i in $(seq $times_of_sort_src); do combine_sort_src+=" $sort_src"; done
+	for i in $(seq $times_of_sort_src); do combine_sort_src="$combine_sort_src $sort_src"; done
 	cat $combine_sort_src > sort.src-alt.$$
 	sort_src=sort.src-alt.$$
 fi
