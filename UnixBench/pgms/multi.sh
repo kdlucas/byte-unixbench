@@ -15,10 +15,21 @@
 ###############################################################################
 ID="@(#)multi.sh:3.4 -- 5/15/91 19:30:24";
 instance=1
-times_of_sort_src=20
+sort_src=sort.src
+times_of_sort_src=${TIMES_OF_SORT_SRC:-1}
+if [ $times_of_sort_src -gt 1 ]; then
+	for i in $(seq $times_of_sort_src); do combine_sort_src+=" $sort_src"; done
+	cat $combine_sort_src > sort.src-alt.$$
+	sort_src=sort.src-alt.$$
+fi
+
 while [ $instance -le $1 ]; do
-	/bin/sh "$UB_BINDIR/tst.sh" $times_of_sort_src &
+	/bin/sh "$UB_BINDIR/tst.sh" $sort_src &
 	instance=$(($instance + 1))
 done
 wait
+
+if [ $times_of_sort_src -gt 1 ]; then
+	rm $sort_src
+fi
 
