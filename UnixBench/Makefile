@@ -97,7 +97,7 @@ else
     ifneq ($(ARCH),$(filter $(ARCH),ppc64 ppc64le))
 	#Add riscv64 support
 	ifeq ($(ARCH),riscv64)
-    	  OPTON += -march=rv64g
+    	  OPTON += -march=rv64g -mabi=lp64d
 	else
           OPTON += -march=native -mtune=native
 	endif
