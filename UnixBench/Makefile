@@ -89,13 +89,18 @@ else
 
   ## OS detection.  Comment out if gmake syntax not supported by other 'make'. 
   OSNAME:=$(shell uname -s)
-  ARCH := $(shell uname -p)
+  ARCH := $(shell uname -m)
   ifeq ($(OSNAME),Linux)
     # Not all CPU architectures support "-march" or "-march=native".
     #   - Supported    : x86, x86_64, ARM, AARCH64, etc..
     #   - Not Supported: RISC-V, IBM Power, etc...
     ifneq ($(ARCH),$(filter $(ARCH),ppc64 ppc64le))
-        OPTON += -march=native -mtune=native
+	#Add riscv64 support
+	ifeq ($(ARCH),riscv64)
+    	  OPTON += -march=rv64g
+	else
+          OPTON += -march=native -mtune=native
+	endif
     else
         OPTON += -mcpu=native -mtune=native
     endif
