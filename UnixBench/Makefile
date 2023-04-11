@@ -33,6 +33,7 @@
 #                    01/13/11 added support for parallel compilation
 #                    01/07/16 [refer to version control commit messages and
 #                              cease using two-digit years in date formats]
+#                    04/11/23 added support for riscv64 
 ##############################################################################
 
 ##############################################################################
@@ -92,8 +93,8 @@ else
   ARCH := $(shell uname -m)
   ifeq ($(OSNAME),Linux)
     # Not all CPU architectures support "-march" or "-march=native".
-    #   - Supported    : x86, x86_64, ARM, AARCH64, etc..
-    #   - Not Supported: RISC-V, IBM Power, etc...
+    #   - Supported    : x86, x86_64, ARM, AARCH64, riscv64, etc..
+    #   - Not Supported: IBM Power, etc...
     ifneq ($(ARCH),$(filter $(ARCH),ppc64 ppc64le))
 	#Add riscv64 support
 	ifeq ($(ARCH),riscv64)
