@@ -1,0 +1,39 @@
+#!/bin/sh
+
+
+ARITH="$SRC_PATHarith.c"
+PGMS_PATH="/home/mouse/byte-unixbench/UnixBench/capsicum_src"
+SRC_PATH="/home/mouse/byte-unixbench/UnixBench/capsicum_src"
+
+
+gcc ${ARITH} -Darithoh -o "$PGMS_PATH/arith"
+gcc ${ARITH} -Ddatum='register int' -o "$PGMS_PATH/register"
+gcc $ARITH -Ddatum='short' -o "$PGMS_PATH/short"
+gcc $ARITH -Ddatum='int' -o "$PGMS_PATH/int"
+gcc $ARITH -Ddatum='long' -o "$PGMS_PATH/long"
+gcc $ARITH -Ddatum='float' -o "$PGMS_PATH/float"
+gcc $ARITH -Ddatum='double' -o "$PGMS_PATH/double"
+
+gcc "$SRC_PATH/time-polling.c" -DUNIXBENCH -DHAS_POLL -o "$PGMS_PATH/poll"
+gcc "$SRC_PATH/time-polling.c" -DUNIXBENCH -DHAS_POLL2 -o "$PGMS_PATH/poll2"
+gcc "$SRC_PATH/time-polling.c" -DUNIXBENCH -DHAS_SELECT -o "$PGMS_PATH/select"
+
+gcc "$SRC_PATH/whets.c" -DDP -DGTODay -DUNIXBENCH -lm -o "$PGMS_PATH/whetstone-double"
+
+gcc "$SRC_PATH/pipe.c" -o "$PGMS_PATH/pipe"
+
+gcc "$SRC_PATH/execl.c" -o "$PGMS_PATH/execl"
+
+gcc "$SRC_PATH/spawn.c" -o "$PGMS_PATH/spawn"
+
+gcc "$SRC_PATH/fstime.c"  -o "$PGMS_PATH/fstime"
+
+gcc "$SRC_PATH/syscall.c" -o "$PGMS_PATH/syscall"
+
+gcc "$SRC_PATH/context1.c" -o "$PGMS_PATH/context1"
+
+gcc "$SRC_PATH/looper.c" -o "$PGMS_PATH/looper"
+
+gcc "$SRC_PATH/dhry_1.c" "./dhry_2.c" -DHZ=${HZ} -o "$PGMS_PATH/dhry2"
+
+gcc "$SRC_PATH/dhry_1.c" "./dhry_2.c" -DHZ=${HZ} -DREG='register' -o "$PGMS_PATH/dhry2reg"
