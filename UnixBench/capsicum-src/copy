@@ -1,0 +1,2 @@
+#!/bin/sh
+sudo cp capsicum_pgms/* /home/mouse/runcap/rootdir/jail1/ub_pgms
