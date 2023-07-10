@@ -1,10 +1,9 @@
 #!/bin/sh
 
 
-ARITH="$SRC_PATHarith.c"
-PGMS_PATH="/home/mouse/byte-unixbench/UnixBench/capsicum_src"
+PGMS_PATH="/home/mouse/byte-unixbench/UnixBench/capsicum_pgms"
 SRC_PATH="/home/mouse/byte-unixbench/UnixBench/capsicum_src"
-
+ARITH="$SRC_PATH/arith.c"
 
 gcc ${ARITH} -Darithoh -o "$PGMS_PATH/arith"
 gcc ${ARITH} -Ddatum='register int' -o "$PGMS_PATH/register"
