@@ -1,10 +1,9 @@
 #!/bin/sh
 
 
-PGMS_PATH="/home/mouse/byte-unixbench/UnixBench/capsicum_pgms"
-SRC_PATH="/home/mouse/byte-unixbench/UnixBench/capsicum_src"
+PGMS_PATH="/home/$(whoami)/byte-unixbench/UnixBench/capsicum_pgms"
+SRC_PATH="/home/$(whoami)/byte-unixbench/UnixBench/capsicum_src"
 ARITH="$SRC_PATH/arith.c"
-
 gcc ${ARITH} -Darithoh -o "$PGMS_PATH/arith"
 gcc ${ARITH} -Ddatum='register int' -o "$PGMS_PATH/register"
 gcc $ARITH -Ddatum='short' -o "$PGMS_PATH/short"
@@ -25,7 +24,7 @@ gcc "$SRC_PATH/execl.c" -o "$PGMS_PATH/execl"
 
 gcc "$SRC_PATH/spawn.c" -o "$PGMS_PATH/spawn"
 
-gcc "$SRC_PATH/fstime.c"  -o "$PGMS_PATH/fstime"
+gcc "$SRC_PATH/fstime.c" -o "$PGMS_PATH/fstime"
 
 gcc "$SRC_PATH/syscall.c" -o "$PGMS_PATH/syscall"
 

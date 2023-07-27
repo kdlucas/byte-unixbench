@@ -40,7 +40,10 @@ char SCCSid[] = "@(#) @(#)fstime.c:3.5 -- 5/15/91 19:30:19";
 #include <unistd.h>
 #include <sys/time.h>
 
+#ifdef __FreeBSD__
 #include <sys/capsicum.h>
+#endif
+
 #define SECONDS 10
 
 #define MAX_BUFSIZE 8192
@@ -203,7 +206,8 @@ char    *argv[];
             perror("fstime: openat");
             exit(1);
     }
-	*/	
+	*/
+#ifdef __FREEBSD__
 		cap_rights_t setrights;
 	
 		cap_rights_init(&setrights, CAP_READ, CAP_WRITE, CAP_CREATE, CAP_FCNTL, CAP_FSTATAT, CAP_FTRUNCATE, CAP_FLOCK, CAP_FSYNC, CAP_LOOKUP);
@@ -213,7 +217,7 @@ char    *argv[];
 		if (cap_rights_limit(g, &setrights) < 0){
 			printf("[error] cap_rights_limit() failed\n");
 		}
-
+#endif
     /* fill buffer */
     for (i=0; i < bufsize; ++i)
             buf[i] = i & 0xff;
