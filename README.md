@@ -1,3 +1,11 @@
+# for capsicum
+
+```
+cd byte-unixbench/UnixBench
+gcc Run_capsicum.c -o Run_capsicum
+./Run_capsicum
+```
+---
 # byte-unixbench
 
 **UnixBench** is the original BYTE UNIX benchmark suite, updated and revised by many people over the years.

@@ -1,3 +1,6 @@
 UnixBench/pgms
 UnixBench/results
 UnixBench/tmp
+UnixBench/*.core
+UnixBench/Run_capsicum
+UnixBench/*.out
