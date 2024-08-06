@@ -1,6 +1,6 @@
 /*******************************************************************************
- *  The BYTE UNIX Benchmarks - Release 31 8/06/24 11:11:11
- *          Module: context2.c   SID: 0.1 
+ *  The BYTE UNIX Benchmarks - Release 3
+ *          Module: context2.c   SID: 0.1 8/06/24 11:11:11
  *
  *******************************************************************************
  * Bug reports, patches, comments, suggestions should be sent to:
@@ -11,7 +11,7 @@
  *******************************************************************************
  *
  ******************************************************************************/
-char SCCSid[] = "@(#) @(#)context1.c:3.3 -- 5/15/91 19:30:18";
+char SCCSid[] = "@(#) @(#)context2.c:0.1 -- 8/06/24 11:11:11";
 /*
  *  Context switching via synchronized named pipe i/o
  *

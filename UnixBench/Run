@@ -259,7 +259,7 @@ my $testParams = {
         "options" => "10",
     },
     "context2" => {
-        "logmsg" => "Pipe-based Context Switching",
+        "logmsg" => "Named Pipe-based Context Switching",
         "cat"    => 'system',
         "repeat" => 'long',
         "options" => "10",
