@@ -138,7 +138,7 @@ int main(int argc, char *argv[])
                     iter, check);
                 exit(2);
             }
-            if ((ret = write(fd2_write, (char *)&iter, sizeof(iter))) != sizeof(check)) {
+            if ((ret = write(fd2_write, (char *)&iter, sizeof(iter))) != sizeof(iter)) {
                 if ((ret == -1) && (errno == EPIPE)) {
                     alarm(0);
                     report(); /* does not return */
