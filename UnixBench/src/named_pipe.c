@@ -1,6 +1,6 @@
 /*******************************************************************************
  *  The BYTE UNIX Benchmarks - Release 3
- *          Module: pipe.c   SID: 3.3 5/15/91 19:30:20
+ *          Module: named_pipe.c   SID: 0.1 -- 8/06/24 11:11:11
  *
  *******************************************************************************
  * Bug reports, patches, comments, suggestions should be sent to:
@@ -10,10 +10,6 @@
  *
  *******************************************************************************
  *  Modification Log:
- *  $Header: pipe.c,v 3.5 87/06/22 14:32:36 kjmcdonell Beta $
- *  August 29, 1990 - modified timing routines (ty)
- *  October 22, 1997 - code cleanup to remove ANSI C compiler warnings
- *                     Andy Kahn <kahn@zk3.dec.com>
  *
  ******************************************************************************/
 char SCCSid[] = "@(#) @(#)named_pipe.c:0.1 -- 8/06/24 11:11:11";
