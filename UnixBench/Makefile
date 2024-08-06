@@ -137,7 +137,7 @@ TMPDIR = ./tmp
 INCLDIR = /usr/include
 LIBDIR = /lib
 SCRIPTS = unixbench.logo multi.sh tst.sh index.base
-SOURCES = arith.c big.c context1.c \
+SOURCES = arith.c big.c context1.c context2.c \
 	dummy.c execl.c \
 	fstime.c hanoi.c \
 	pipe.c spawn.c \
@@ -159,7 +159,7 @@ BINS = $(PROGDIR)/arithoh $(PROGDIR)/register $(PROGDIR)/short \
 	$(PROGDIR)/pipe $(PROGDIR)/spawn $(PROGDIR)/execl \
 	$(PROGDIR)/dhry2 $(PROGDIR)/dhry2reg  $(PROGDIR)/looper \
 	$(PROGDIR)/fstime $(PROGDIR)/whetstone-double $(PROGDIR)/named_pipe \
-	$(GRAPHIC_BINS)
+	$(PROGDIR)/context2 $(GRAPHIC_BINS)
 ## These compile only on some platforms...
 # $(PROGDIR)/poll $(PROGDIR)/poll2 $(PROGDIR)/select
 
@@ -281,6 +281,8 @@ $(PROGDIR)/fstime: $(SRCDIR)/fstime.c
 $(PROGDIR)/syscall: $(SRCDIR)/syscall.c $(SRCDIR)/timeit.c
 
 $(PROGDIR)/context1: $(SRCDIR)/context1.c $(SRCDIR)/timeit.c
+
+$(PROGDIR)/context2: $(SRCDIR)/context2.c $(SRCDIR)/timeit.c
 
 $(PROGDIR)/looper: $(SRCDIR)/looper.c $(SRCDIR)/timeit.c
 
