@@ -28,10 +28,15 @@ char SCCSid[] = "@(#) @(#)named_pipe.c:0.1 -- 8/06/24 11:11:11";
 #include "timeit.c"
 
 unsigned long iter;
+char fifo_name[] = "/tmp/test_fifoXXXXXX";
 
 void report()
 {
     fprintf(stderr,"COUNT|%ld|1|lps\n", iter);
+
+    // Clean up
+    unlink(fifo_name);
+
     exit(0);
 }
 
@@ -39,7 +44,6 @@ int main(int argc, char *argv[])
 {
     char buf[512];
     int fd_read, fd_write, duration;
-    char fifo_name[] = "/tmp/test_fifoXXXXXX";
 
     if (argc != 2) {
         fprintf(stderr,"Usage: %s duration\n", argv[0]);
@@ -88,10 +92,4 @@ int main(int argc, char *argv[])
         }
         iter++;
     }
-
-    // Clean up
-    close(fd_read);
-    close(fd_write);
-    unlink(fifo_name);
 }
-

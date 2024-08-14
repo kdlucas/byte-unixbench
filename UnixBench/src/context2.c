@@ -28,10 +28,17 @@ char SCCSid[] = "@(#) @(#)context2.c:0.1 -- 8/06/24 11:11:11";
 #include "timeit.c"
 
 unsigned long iter;
+char fifo1_name[] = "/tmp/test_fifo1XXXXXX";
+char fifo2_name[] = "/tmp/test_fifo2XXXXXX";
 
 void report()
 {
     fprintf(stderr, "COUNT|%lu|1|lps\n", iter);
+
+    // Clean up
+    unlink(fifo1_name);
+    unlink(fifo2_name);
+
     exit(0);
 }
 
@@ -41,8 +48,6 @@ int main(int argc, char *argv[])
     unsigned long check;
     int fd1_read, fd1_write, fd2_read, fd2_write;
     ssize_t ret;
-    char fifo1_name[] = "/tmp/test_fifo1XXXXXX";
-    char fifo2_name[] = "/tmp/test_fifo2XXXXXX";
 
     if (argc != 2) {
         fprintf(stderr, "Usage: context duration\n");
@@ -151,8 +156,5 @@ int main(int argc, char *argv[])
         }
     }
 
-    // Clean up
-    unlink(fifo1_name);
-    unlink(fifo2_name);
 }
 
