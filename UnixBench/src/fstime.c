@@ -269,9 +269,9 @@ int w_test(int timeSecs)
         extern int sigalarm;
 
         /* Sync and let it settle */
-        sync();
+        fsync(f);
         sleep(2);
-        sync();
+        fsync(f);
         sleep(2);
 
         /* Set an alarm. */
@@ -322,9 +322,9 @@ int r_test(int timeSecs)
         extern int sigalarm;
 
         /* Sync and let it settle */
-        sync();
+        fsync(f);
         sleep(2);
-        sync();
+        fsync(f);
         sleep(2);
 
         /* rewind */
@@ -386,9 +386,11 @@ int c_test(int timeSecs)
         double start, end;
         extern int sigalarm;
 
-        sync();
+        fsync(f);
+        fsync(g);
         sleep(2);
-        sync();
+        fsync(f);
+        fsync(g);
         sleep(1);
 
         /* rewind */
