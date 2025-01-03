@@ -58,6 +58,7 @@ use FindBin;
 # 2007.10.14    IS      Set and report LANG.  Added "grep" and "sysexec".
 # 2007.12.22    IS      Tiny fixes; see README.
 # 2011.01.13    KDL     Fix for parallel compilation.
+# 2025.01.02	ZZK	Improve getCpuInfo() function for arm64 CPUs.
 
 
 ############################################################################
@@ -512,6 +513,115 @@ my $x86CpuFlags = {
     'svm' => "AMD virtualization",
 };
 
+my $armCpuImplementers = {
+    '0x41' => "ARM",
+    '0x42' => "Broadcom",
+    '0x43' => "Cavium",
+    '0x46' => "FUJITSU",
+    '0x48' => "HiSilicon",
+    '0x4e' => "NVIDIA",
+    '0x50' => "APM",
+    '0x51' => "Qualcomm",
+    '0x61' => "Apple",
+    '0x6d' => "Microsoft",
+    '0xc0' => "Ampere",
+};
+
+my $armCpuParts = {
+    "ARM" => {
+        "0xd00" => "Foundation",
+        "0xd03" => "Cortex-A53",
+        "0xd04" => "Cortex-A35",
+        "0xd05" => "Cortex-A55",
+        "0xd07" => "Cortex-A57",
+        "0xd08" => "Cortex-A72",
+        "0xd09" => "Cortex-A73",
+        "0xd0a" => "Cortex-A75",
+        "0xd0b" => "Cortex-A76",
+        "0xd0c" => "Neoverse-N1",
+        "0xd0d" => "Cortex-A77",
+        "0xd0f" => "AEMv8",
+        "0xd40" => "Neoverse-V1",
+        "0xd41" => "Cortex-A78",
+        "0xd42" => "Cortex-A78AE",
+        "0xd44" => "Cortex-X1",
+        "0xd46" => "Cortex-A510",
+        "0xd47" => "Cortex-A710",
+        "0xd48" => "Cortex-X2",
+        "0xd49" => "Neoverse-N2",
+        "0xd4b" => "Cortex-A78C",
+        "0xd4c" => "Cortex-X1C",
+        "0xd4d" => "Cortex-A715",
+        "0xd4e" => "Cortex-X3",
+        "0xd4f" => "Neoverse-V2",
+        "0xd80" => "Cortex-A520",
+        "0xd81" => "Cortex-A720",
+        "0xd82" => "Cortex-X4",
+        "0xd84" => "Neoverse-V3",
+        "0xd85" => "Cortex-X925",
+        "0xd87" => "Cortex-A725",
+        "0xd8e" => "Neoverse-N3",
+    },
+    "APM" => {
+        "0x000" => "X-Gene",
+    },
+    "Cavium" => {
+        "0x0a1" => "ThunderX",
+        "0x0a2" => "ThunderX-81XX",
+        "0x0a3" => "ThunderX-83XX",
+        "0x0af" => "ThunderX2",
+        "0x0b1" => "OcteonTX2-98XX",
+        "0x0b2" => "OcteonTX2-96XX",
+        "0x0b3" => "OcteonTX2-95XX",
+        "0x0b4" => "OcteonTX2-95XXN",
+        "0x0b5" => "OcteonTX2-95XXMM",
+        "0x0b6" => "OcteonTX2-95XXO",
+    },
+    "Broadcom" => {
+        "0x100" => "Brahma-B53",
+        "0x516" => "Vulcan",
+    },
+    "Qualcomm" => {
+        "0x200" => "Kryo",
+        "0xc00" => "Falkor",
+        "0x800" => "Falkor-V1/Kryo-2XX-Gold",
+        "0x801" => "Kryo-2XX-Silver",
+        "0x803" => "Kryo-3XX-Silver",
+        "0x804" => "Kryo-4XX-Gold",
+        "0x805" => "Kryo-4XX-Silver",
+    },
+    "NVIDIA" => {
+        "0x003" => "Denver",
+        "0x004" => "Carmel",
+    },
+    "FUJITSU" => {
+        "0x001" => "A64FX",
+    },
+    "HiSilicon" => {
+        "0xd01" => "TaiShan-v110",
+    },
+    "Apple" => {
+        "0x022" => "Icestorm-M1",
+        "0x023" => "Firestorm-M1",
+        "0x024" => "Icestorm-M1-Pro",
+        "0x025" => "Firestorm-M1-Pro",
+        "0x028" => "Icestorm-M1-Max",
+        "0x029" => "Firestorm-M1-Max",
+        "0x032" => "Blizzard-M2",
+        "0x033" => "Avalanche-M2",
+        "0x034" => "Blizzard-M2-Pro",
+        "0x035" => "Avalanche-M2-Pro",
+        "0x038" => "Blizzard-M2-Max",
+        "0x039" => "Avalanche-M2-Max",
+    },
+    "Ampere" => {
+        "0xac3" => "Ampere-1",
+        "0xac4" => "Ampere-1a",
+    },
+    "Microsoft" => {
+        "0xd49" => "Azure-Cobalt-100",
+    },
+};
 
 ############################################################################
 # UTILITIES
@@ -675,6 +785,26 @@ sub mergeParams {
 # SYSTEM ANALYSIS
 ############################################################################
 
+sub parseArmCpuImplementer {
+    my ( $implementerIdStr ) = @_;
+    my $CpuImplementer = $armCpuImplementers->{$implementerIdStr};
+    if (defined($CpuImplementer)) {
+	$CpuImplementer;
+    } else {
+	"CPU implementer $implementerIdStr";
+    }
+}
+
+sub parseArmCpuPart {
+    my ( $implementerIdStr, $partIdStr ) = @_;
+    my $CpuPart = $armCpuParts->{$implementerIdStr}->{$partIdStr};
+    if (defined($CpuPart)) {
+	$CpuPart;
+    } else {
+	"CPU part $partIdStr";
+    }
+}
+
 # Extract interesting flags from the given processor flags string and
 # convert them to descriptive names.
 sub processCpuFlags {
@@ -698,25 +828,48 @@ sub processCpuFlags {
 # future: on systems without /proc/cpuinfo, might check for Perl modules:
 #   Sys::Info::Device::CPU or Sys::CpuAffinity
 sub getCpuInfo {
+    my $mach = $^O ne "aix"
+      ? getCmdOutput("uname -m")
+      : getCmdOutput("uname -p");
+
     if (!("$^O" eq "darwin")) {
         open(my $fd, "<", "/proc/cpuinfo") || return undef;
 
         my $cpus = [ ];
         my $cpu = 0;
+	my $armCpuImplementer="";
         while (<$fd>) {
             chomp;
             my ( $field, $val ) = split(/[ \t]*:[ \t]*/);
             next if (!$field || !$val);
-            if ($field eq "processor") {
-                $cpu = $val;
-            } elsif ($field eq "model name") {
-                my $model = $val;
-                $model =~ s/  +/ /g;
-                $cpus->[$cpu]{'model'} = $model;
-            } elsif ($field eq "bogomips" || $field eq "BogoMIPS") {
-                $cpus->[$cpu]{'bogo'} = $val;
-            } elsif ($field eq "flags") {
-                $cpus->[$cpu]{'flags'} = processCpuFlags($val);
+            if ($mach eq "aarch64") {
+                if ($field eq "processor") {
+                        $cpu = $val;
+                } elsif ($field eq "CPU implementer") {
+                        my $model = $val;
+                        $model =~ s/  +/ /g;
+                        $armCpuImplementer = parseArmCpuImplementer($model);
+                        $cpus->[$cpu]{'model'} = $armCpuImplementer;
+                } elsif ($field eq "CPU part" && $armCpuImplementer ne "") {
+                        my $armCpuPart = parseArmCpuPart($armCpuImplementer, $val);
+                        $cpus->[$cpu]{'model'} = "$armCpuImplementer $armCpuPart";
+                } elsif ($field eq "BogoMIPS") {
+                        $cpus->[$cpu]{'bogo'} = $val;
+                } elsif ($field eq "Features") {
+                        $cpus->[$cpu]{'flags'} = "CPU Features: $val";
+                }
+            } else {
+                if ($field eq "processor") {
+                        $cpu = $val;
+                } elsif ($field eq "model name") {
+                        my $model = $val;
+                        $model =~ s/  +/ /g;
+                        $cpus->[$cpu]{'model'} = $model;
+                } elsif ($field eq "bogomips" || $field eq "BogoMIPS") {
+                        $cpus->[$cpu]{'bogo'} = $val;
+                } elsif ($field eq "flags") {
+                        $cpus->[$cpu]{'flags'} = processCpuFlags($val);
+                }
             }
         }
 
