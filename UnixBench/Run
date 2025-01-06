@@ -100,6 +100,11 @@ my $RESULTDIR = getDir('UB_RESULTDIR', $FindBin::Bin . "/results");
 # Directory where the tests are executed.
 my $TESTDIR = getDir('UB_TESTDIR', $FindBin::Bin . "/testdir");
 
+# System information
+my $systemInfo = getSystemInfo();
+
+# Multi-parallel literal
+my $multiParallel = "Multi-parallel copies";
 
 ############################################################################
 # TEST SPECIFICATIONS
@@ -256,6 +261,7 @@ my $testParams = {
         "cat"    => 'system',
         "repeat" => 'long',
         "options" => "10",
+        "system_capacity_parallel_factor" => 2,
     },
     "pipe" => {
         "logmsg" => "Pipe Throughput",
@@ -1053,6 +1059,7 @@ sub parseArgs {
     # Generate the requested list of bench programs.
     my $opt;
     my $word;
+    my $copies;
     while ($word = shift(@words)) {
         if ($word !~ m/^-/) {               # A test name.
             if ($word eq "all") {
@@ -1075,7 +1082,9 @@ sub parseArgs {
             if (!defined($params->{'copies'})) {
                 $params->{'copies'} = [ ];
             }
-            push(@{$params->{'copies'}}, shift(@words));
+            $copies = shift(@words);
+            abortRun("-c copies should be positive integer") if ($copies !~ m/^\d+$/ || $copies <= 0);
+            push(@{$params->{'copies'}}, $copies);
         } else {
             die("Run: unknown option $word\n");
         }
@@ -1495,7 +1504,7 @@ sub runBenchmark {
     $params->{'command'} = $command;
 
     # Set up the benchmark results structure.
-    my $bresult = { 'name' => $bench, 'msg' => $params->{'logmsg'} };
+    my $bresult = { 'name' => $bench, 'msg' => $params->{'logmsg'}, 'copies' => $copies};
 
     if ($verbose > 0) {
         printf "\n%d x %s ", $copies, $params->{'logmsg'};
@@ -1569,13 +1578,22 @@ sub runTests {
             abortRun("unknown benchmark \"$bench\"");
         }
 
+        my $benchCopies = $copies;
+        if ($benchCopies == 0) {
+            $benchCopies = $systemInfo->{'numCpus'};
+            my $pFactor = $params->{'system_capacity_parallel_factor'};
+            if (defined $pFactor) {
+                $benchCopies *= $pFactor;
+            }
+        }
+
         # If the benchmark doesn't want to run with this many copies, skip it.
         my $cat = $params->{'cat'};
         my $maxCopies = $testCats->{$cat}{'maxCopies'};
-        next if ($maxCopies > 0 && $copies > $maxCopies);
+        next if ($maxCopies > 0 && $benchCopies > $maxCopies);
 
         # Run the benchmark.
-        my $bresult = runBenchmark($bench, $params, $verbose, $logFile, $copies);
+        my $bresult = runBenchmark($bench, $params, $verbose, $logFile, $benchCopies);
         $results->{$bench} = $bresult;
     }
     $results->{'end'} = time();
@@ -1603,7 +1621,8 @@ sub runTests {
 # Display a banner indicating the configuration of the system under test
 # to the given file desc.
 sub displaySystem {
-    my ( $info, $fd ) = @_;
+    my ( $fd ) = @_;
+    my $info = $systemInfo;
 
     # Display basic system info.
     printf $fd "   System: %s: %s\n", $info->{'name'}, $info->{'system'};
@@ -1640,9 +1659,9 @@ sub logResults {
     # Display the individual test scores.
     foreach my $bench (@{$results->{'list'}}) {
         my $bresult = $results->{$bench};
-
-        printf $outFd "%-40s %12.1f %-5s (%.1f s, %d samples)\n",
-                      $bresult->{'msg'},
+        my $copiesInfo = number($bresult->{'copies'}, "copy", "copies");
+        printf $outFd "%-55s %12.1f %-5s (%.1f s, %d samples)\n",
+                      $bresult->{'msg'}."($copiesInfo)",
                       $bresult->{'score'},
                       $bresult->{'scorelabel'},
                       $bresult->{'time'},
@@ -1673,21 +1692,22 @@ sub logIndexCat {
     # scores, or a partial set.
     my $head = $testCats->{$cat}{'name'} .
                         ($full ? " Index Values" : " Partial Index");
-    printf $outFd "%-40s %12s %12s %8s\n",
+    printf $outFd "%-55s %12s %12s %8s\n",
                   $head, "BASELINE", "RESULT", "INDEX";
 
     # Display the individual test scores.
     foreach my $bench (@{$results->{'list'}}) {
         my $bresult = $results->{$bench};
         next if $bresult->{'cat'} ne $cat;
+        my $copiesInfo = number($bresult->{'copies'}, "copy", "copies");
 
 	if (defined($bresult->{'iscore'}) && defined($bresult->{'index'})) {
-            printf $outFd "%-40s %12.1f %12.1f %8.1f\n",
-                      $bresult->{'msg'}, $bresult->{'iscore'},
+            printf $outFd "%-55s %12.1f %12.1f %8.1f\n",
+                      $bresult->{'msg'}."($copiesInfo)", $bresult->{'iscore'},
                       $bresult->{'score'}, $bresult->{'index'};
 	} else {
-            printf $outFd "%-40s %12s %12.1f %8s\n",
-                      $bresult->{'msg'}, "---",
+            printf $outFd "%-55s %12s %12.1f %8s\n",
+                      $bresult->{'msg'}."($copiesInfo)", "---",
                       $bresult->{'score'}, "---";
 	}
     }
@@ -1697,8 +1717,8 @@ sub logIndexCat {
     if (!$full) {
         $title .= " (Partial Only)";
     }
-    printf $outFd "%-40s %12s %12s %8s\n", "", "", "", "========";
-    printf $outFd "%-66s %8.1f\n", $title, $iscore;
+    printf $outFd "%-55s %12s %12s %8s\n", "", "", "", "========";
+    printf $outFd "%-81s %8.1f\n", $title, $iscore;
 
     printf $outFd "\n";
 }
@@ -1717,7 +1737,7 @@ sub logIndex {
 
 # Dump the given run results into the given report file.
 sub summarizeRun {
-    my ( $systemInfo, $results, $verbose, $reportFd ) = @_;
+    my ( $results, $verbose, $reportFd ) = @_;
 
     # Display information about this test run.
     printf $reportFd "------------------------------------------------------------------------\n";
@@ -1727,7 +1747,7 @@ sub summarizeRun {
            strftime("%H:%M:%S", localtime($results->{'end'}));
     printf $reportFd "%s in system; running %s of tests\n",
            number($systemInfo->{'numCpus'}, "CPU"),
-           number($results->{'copies'}, "parallel copy", "parallel copies");
+           $results->{'copies'} == 0 ? $multiParallel : number($results->{'copies'}, "parallel copy", "parallel copies");
     printf $reportFd "\n";
 
     # Display the run scores.
@@ -1750,7 +1770,8 @@ sub summarizeRunCsvHeader {
     # Write CSV Headers of test.
     foreach my $bench (@{$results->{'list'}}) {
         my $bresult = $results->{$bench};
-        printf $reportFd ",%s", $bresult->{'msg'};
+        my $copiesInfo = number($bresult->{'copies'}, "copy", "copies");
+        printf $reportFd ",%s", $bresult->{'msg'}."($copiesInfo)";
     }
     printf $reportFd "\n";
 }
@@ -1786,7 +1807,7 @@ sub summarizeRunCsvRows {
 
 # Dump the given run results into the given report file.
 sub runHeaderHtml {
-    my ( $systemInfo, $reportFd ) = @_;
+    my ( $reportFd ) = @_;
 
     # Display information about this test run.
     my $title = sprintf "Benchmark of %s / %s on %s",
@@ -1833,7 +1854,8 @@ EOF
 # Display a banner indicating the configuration of the system under test
 # to the given file desc.
 sub displaySystemHtml {
-    my ( $info, $fd ) = @_;
+    my ( $fd ) = @_;
+    my $info = $systemInfo;
 
     printf $fd "<h3>Test System Information</h3>\n";
     printf $fd "<p><table>\n";
@@ -1987,7 +2009,7 @@ sub logResultsHtml {
 
 # Dump the given run results into the given report file.
 sub summarizeRunHtml {
-    my ( $systemInfo, $results, $verbose, $reportFd ) = @_;
+    my ( $results, $verbose, $reportFd ) = @_;
 
     # Display information about this test run.
     my $time = $results->{'end'} - $results->{'start'};
@@ -2054,15 +2076,15 @@ sub main {
     createDirrectoriesIfNotExists(@creatingDirectories);
 
     preChecks();
-    my $systemInfo = getSystemInfo();
 
     # If the number of copies to run was not set, set it to 1
-    # and the number of CPUs in the system (if > 1).
+    # and the system capacity based on number of CPUs in the system
+    # (if > 1) and per benchmark characteristic.
     my $copies = $params->{'copies'};
     if (!$copies || scalar(@$copies) == 0) {
         push(@$copies, 1);
         if (defined($systemInfo->{'numCpus'}) && $systemInfo->{'numCpus'} > 1) {
-            push(@$copies, $systemInfo->{'numCpus'});
+            push(@$copies, 0);
         }
     }
 
@@ -2103,23 +2125,23 @@ sub main {
     }
 
     printf $reportFd "   BYTE UNIX Benchmarks (Version %s)\n\n", $version;
-    runHeaderHtml($systemInfo, $reportFd2);
+    runHeaderHtml($reportFd2);
 
     # Dump information about the system under test.
-    displaySystem($systemInfo, $reportFd);
-    displaySystemHtml($systemInfo, $reportFd2);
+    displaySystem($reportFd);
+    displaySystemHtml($reportFd2);
 
     # Run the tests!  Do a test run once for each desired number of copies;
     # for example, on a 2-CPU system, we may do a single-processing run
     # followed by a dual-processing run.
     foreach my $c (@$copies) {
         if ($verbose > 1) {
-            printf "Run with %s\n", number($c, "copy", "copies");
+            printf "Run with %s\n", $c == 0 ? $multiParallel : number($c, "copy", "copies");
         }
         my $results = runTests($tests, $verbose, $logFile, $c);
 
-        summarizeRun($systemInfo, $results, $verbose, $reportFd);
-        summarizeRunHtml($systemInfo, $results, $verbose, $reportFd2);
+        summarizeRun($results, $verbose, $reportFd);
+        summarizeRunHtml($results, $verbose, $reportFd2);
 
         if ($isOutputFormatCsv) {
             if ( $is_csv_header_written == 0 ) {
