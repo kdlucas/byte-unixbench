@@ -35,11 +35,12 @@ The Run script takes a number of options which you can use to customise a
 test, and you can specify the names of the tests to run.  The full usage
 is:
 
-    Run [ -q | -v ] [-i <n> ] [-c <n> [-c <n> ...]] [test ...]
+    Run [ -q | -b | -v ] [-i <n> ] [-c <n> [-c <n> ...]] [test ...]
 
 The option flags are:
 
   -q            Run in quiet mode.
+  -b		Run in brief mode, do not display mass of cpu info details.
   -v            Run in verbose mode.
   -i <count>    Run <count> iterations for each test -- slower tests
                 use <count> / 3, but at least 1.  Defaults to 10 (3 for
