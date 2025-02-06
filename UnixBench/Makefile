@@ -55,7 +55,7 @@ GL_LIBS = -lGL -lXext -lX11
 # COMPILER CONFIGURATION: Set "CC" to the name of the compiler to use
 # to build the binary benchmarks.  You should also set "$cCompiler" in the
 # Run script to the name of the compiler you want to test.
-CC=gcc
+CC?=gcc
 
 # OPTIMISATION SETTINGS:
 # Use gcc option if defined UB_GCC_OPTIONS via "Environment variable" or "Command-line arguments".
@@ -89,7 +89,7 @@ else
 
   ## OS detection.  Comment out if gmake syntax not supported by other 'make'. 
   OSNAME:=$(shell uname -s)
-  ARCH := $(shell uname -m)
+  ARCH ?= $(shell uname -m)
   ifeq ($(OSNAME),Linux)
     # Not all CPU architectures support "-march" or "-march=native".
     #   - Supported    : x86, x86_64, ARM, AARCH64, riscv64, etc..
