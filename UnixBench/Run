@@ -130,7 +130,7 @@ my $fs = [
 
 my $oldsystem = [
     "execl", "fstime", "fsbuffer", "fsdisk", "pipe", "context1", "spawn",
-    "syscall"
+    "syscall", "named_pipe", "context2"
 ];
 
 my $system = [
@@ -154,7 +154,9 @@ my $testList = {
     "whetstone-double"   => undef,
     "syscall"       => undef,
     "pipe"          => undef,
+    "named_pipe"    => undef,
     "context1"      => undef,
+    "context2"      => undef,
     "spawn"         => undef,
     "execl"         => undef,
     "fstime-w"      => undef,
@@ -261,8 +263,20 @@ my $testParams = {
         "repeat" => 'long',
         "options" => "10",
     },
+    "context2" => {
+        "logmsg" => "Named Pipe-based Context Switching",
+        "cat"    => 'system',
+        "repeat" => 'long',
+        "options" => "10",
+    },
     "pipe" => {
         "logmsg" => "Pipe Throughput",
+        "cat"    => 'system',
+        "repeat" => 'long',
+        "options" => "10",
+    },
+    "named_pipe" => {
+        "logmsg" => "Named Pipe Throughput",
         "cat"    => 'system',
         "repeat" => 'long',
         "options" => "10",
