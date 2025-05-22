@@ -1,4 +1,4 @@
-Version 5.1.3 -- 2011-01-13
+Version 6.0.0 -- 2025-05-21
 
 ================================================================
 To use Unixbench:
@@ -26,6 +26,41 @@ For information on adding tests into the benchmark, see "WRITING_TESTS".
 
 
 ===================== RELEASE NOTES =====================================
+
+========================  May 21 ==========================
+v6.0.0
+
+Build System Modernization
+Introduced support for custom compiler flags via the UB_GCC_OPTIONS environment variable.
+Architecture-aware compiler optimization flags (e.g., -march=native, -mcpu=native) for x86, ARM, RISC-V, PowerPC, etc.
+Cleaner and more portable Makefile, compatible with GNU Make.
+Improved separation of CFLAGS and LDFLAGS with autodetection of platform-specific needs.
+
+Platform & Architecture Enhancements
+Added detailed ARM64 CPU detection with support for multiple vendors (ARM, Ampere, Cavium, Apple, etc.).
+Improved support for macOS using sysctl and Darwin-specific logic.
+Portable CPU core detection using nproc, getconf, and fallback logic.
+Improved fallback behavior when /proc/cpuinfo is unavailable.
+
+System Detection and Configuration
+Run script now uses FindBin for consistent directory resolution.
+Default directories (pgms, results, tmp) are created automatically if missing.
+Log file names can now be customized via UB_OUTPUT_FILE_NAME environment variable.
+Improved cross-platform compatibility and shell behavior.
+
+Documentation and Licensing
+Added official GPL v2 license file.
+Rewritten and modernized README.md in Markdown format.
+Clear explanation of each benchmark test and history of the project.
+Updated contributor credits and project guidelines.
+
+
+Performance Comparison Guidelines
+To ensure meaningful and repeatable benchmarking results, it is strongly recommended to maintain consistency in the following areas when comparing performance
+Operating System: Use the same OS distribution and version.
+Compiler Options: Use consistent compiler flags across test cases (e.g., -O3, -march=native).
+System Configuration: Ensure similar runtime environments (CPU governor, I/O scheduler, background load).
+Benchmark Version: Always compare results using the same version of UnixBench
 
 ========================  Jan 13 ==========================
 
