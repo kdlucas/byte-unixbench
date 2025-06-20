@@ -31,7 +31,7 @@ unsigned long iter;
 char *cmd_argv[28];
 int  cmd_argc;
 
-void report(void)
+void report(int sig)
 {
         fprintf(stderr,"COUNT|%lu|60|lpm\n", iter);
 	exit(0);

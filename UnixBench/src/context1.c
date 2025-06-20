@@ -31,7 +31,7 @@ char SCCSid[] = "@(#) @(#)context1.c:3.3 -- 5/15/91 19:30:18";
 
 unsigned long iter;
 
-void report()
+void report(int sig)
 {
 	fprintf(stderr, "COUNT|%lu|1|lps\n", iter);
 	exit(0);
@@ -70,7 +70,7 @@ char	*argv[];
 			if ((ret = write(p1[1], (char *)&iter, sizeof(iter))) != sizeof(iter)) {
 				if ((ret == -1) && (errno == EPIPE)) {
 					alarm(0);
-					report(); /* does not return */
+					report(0); /* does not return */
 				}
 				if ((ret == -1) && (errno != 0) && (errno != EINTR))
 					perror("master write failed");
@@ -79,7 +79,7 @@ char	*argv[];
 			if ((ret = read(p2[0], (char *)&check, sizeof(check))) != sizeof(check)) {
 				if ((ret == 0)) { /* end-of-stream */
 					alarm(0);
-					report(); /* does not return */
+					report(0); /* does not return */
 				}
 				if ((ret == -1) && (errno != 0) && (errno != EINTR))
 					perror("master read failed");
@@ -100,7 +100,7 @@ char	*argv[];
 			if ((ret = read(p1[0], (char *)&check, sizeof(check))) != sizeof(check)) {
 				if ((ret == 0)) { /* end-of-stream */
 					alarm(0);
-					report(); /* does not return */
+					report(0); /* does not return */
 				}
 				if ((ret == -1) && (errno != 0) && (errno != EINTR))
 					perror("slave read failed");
@@ -114,7 +114,7 @@ char	*argv[];
 			if ((ret = write(p2[1], (char *)&iter, sizeof(iter))) != sizeof(check)) {
 				if ((ret == -1) && (errno == EPIPE)) {
 					alarm(0);
-					report(); /* does not return */
+					report(0); /* does not return */
 				}
 				if ((ret == -1) && (errno != 0) && (errno != EINTR))
 					perror("slave write failed");

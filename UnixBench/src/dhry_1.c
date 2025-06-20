@@ -42,7 +42,7 @@ char SCCSid[] = "@(#) @(#)dhry_1.c:3.4 -- 5/15/91 19:30:21";
 
 unsigned long Run_Index;
 
-void report()
+void report(int sig)
 {
 	fprintf(stderr,"COUNT|%ld|1|lps\n", Run_Index);
 	exit(0);
@@ -59,7 +59,7 @@ char            Ch_1_Glob,
 int             Arr_1_Glob [50];
 int             Arr_2_Glob [50] [50];
 
-Enumeration     Func_1 ();
+Enumeration     Func_1 (char, char);
   /* forward declaration necessary since Enumeration may not simply be int */
 
 #ifndef REG

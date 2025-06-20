@@ -91,8 +91,8 @@ char buf[MAX_BUFSIZE];
 int                     f;
 int                     g;
 int                     i;
-void                    stop_count();
-void                    clean_up();
+void                    stop_count(int);
+void                    clean_up(int);
 int                     sigalarm = 0;
 
 /******************** MAIN ****************************/
@@ -199,7 +199,7 @@ char    *argv[];
     for (i=0; i < bufsize; ++i)
             buf[i] = i & 0xff;
 
-    signal(SIGKILL,clean_up);
+    signal(SIGKILL, clean_up);
 
     /*
      * Run the selected test.
@@ -239,11 +239,11 @@ char    *argv[];
         exit(6);
     }
     if (status) {
-        clean_up();
+        clean_up(0);
         exit(1);
     }
 
-    clean_up();
+    clean_up(0);
     exit(0);
 }
 
@@ -288,7 +288,7 @@ int w_test(int timeSecs)
                                         perror("fstime: write");
                                         return(-1);
                                 }
-                                stop_count();
+                                stop_count(0);
                                 counted += ((tmp+HALFCOUNT)/COUNTSIZE);
                         } else
                                 counted += count_per_buf;
@@ -348,7 +348,7 @@ int r_test(int timeSecs)
                                 counted += (tmp+HALFCOUNT)/COUNTSIZE;
                                 continue;
                         case EINTR:
-                                stop_count();
+                                stop_count(0);
                                 counted += (tmp+HALFCOUNT)/COUNTSIZE;
                                 break;
                         default:
@@ -415,7 +415,7 @@ int c_test(int timeSecs)
                                 counted += ( (tmp * write_score) /
                                         (read_score + write_score)
                                         + HALFCOUNT) / COUNTSIZE;
-                                stop_count();
+                                stop_count(0);
                                 break;
                         default:
                                 perror("fstime: copy read");
@@ -436,7 +436,7 @@ int c_test(int timeSecs)
                                         ( ((bufsize - tmp) * write_score) /
                                         (read_score + write_score) )
                                         + HALFCOUNT) / COUNTSIZE;
-                                stop_count();
+                                stop_count(0);
                         } else
                                 counted += count_per_buf;
                 }
@@ -457,13 +457,13 @@ int c_test(int timeSecs)
         return(0);
 }
 
-void stop_count(void)
+void stop_count(int sig)
 {
         extern int sigalarm;
         sigalarm = 1;
 }
 
-void clean_up(void)
+void clean_up(int sig)
 {
         unlink(FNAME0);
         unlink(FNAME1);

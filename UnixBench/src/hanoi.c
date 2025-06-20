@@ -30,7 +30,7 @@ unsigned long iter = 0;
 int num[4];
 long cnt;
 
-void report()
+void report(int sig)
 {
 	fprintf(stderr,"COUNT|%ld|1|lps\n", iter);
 	exit(0);

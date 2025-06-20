@@ -36,7 +36,7 @@ char	bss[8*1024];	/* something worthwhile */
 #undef main
 
 /* added by BYTE */
-char *getenv();
+char *getenv(const char *name);
 
 
 int main(argc, argv)	/* the real program */

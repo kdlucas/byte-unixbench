@@ -34,7 +34,7 @@ char SCCSid[] = "@(#) @(#)syscall.c:3.3 -- 5/15/91 19:30:21";
 
 unsigned long iter;
 
-void report()
+void report(int sig)
 {
 	fprintf(stderr,"COUNT|%ld|1|lps\n", iter);
 	exit(0);

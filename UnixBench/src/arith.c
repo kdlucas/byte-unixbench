@@ -38,7 +38,7 @@ int dumb_stuff(int);
 volatile unsigned long iter;
 
 /* this function is called when the alarm expires */
-void report()
+void report(int sig)
 {
 	fprintf(stderr,"COUNT|%ld|1|lps\n", iter);
 	exit(0);

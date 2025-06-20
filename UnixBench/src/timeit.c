@@ -31,7 +31,7 @@
 
 void wake_me(seconds, func)
 	int seconds;
-	void (*func)();
+	void (*func)(int);
 {
 	/* set up the signal handler */
 	signal(SIGALRM, func);
