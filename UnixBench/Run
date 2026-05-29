@@ -1003,7 +1003,7 @@ sub getSystemInfo {
     }
 
     # Get graphics hardware info.
-    $info->{'graphics'} = getCmdOutput("3dinfo | cut -f1 -d\'(\'");
+    $info->{'graphics'} = getCmdOutput("3dinfo 2>/dev/null | cut -f1 -d\'(\'");
 
     # Get system run state, load and usage info.
     $info->{'runlevel'} = getCmdOutput("who -r | awk '{print \$3}'");
@@ -1186,7 +1186,7 @@ sub combinePassResults {
 
         # If $timebase is 0 the figure is a rate; else compute
         # counts per $timebase.  $time is always seconds.
-        if ($timebase > 0 && $time > 0) {
+        if (defined($timebase) and ($timebase > 0 && $time > 0)) {
             $sum += $count / ($time / $timebase);
             $product += log($count) - log($time / $timebase) if ($count > 0);
         } else {
@@ -1471,14 +1471,17 @@ sub runOnePass {
         }
         printLog($logFile, "\n");
 
-        # If it failed, bomb out.
+        # If it failed without certain exceptions, bomb out.
         if (defined($res->{'ERROR'})) {
+            next if ($res->{'ERROR'} =~ "Fontconfig warning");
+            next if ($res->{'ERROR'} =~ "command returned status");
+
             my $name = $params->{'logmsg'};
             abortRun("\"$name\": " . $res->{'ERROR'});
         }
 
         # Count up the score.
-        $count += $res->{'COUNT0'};
+        $count += $res->{'COUNT0'} if (defined $res->{'COUNT0'});
         $time += $res->{'TIME'} || $res->{'elapsed'};
         $elap += $res->{'elapsed'};
     }
@@ -1656,12 +1659,18 @@ sub logResults {
     foreach my $bench (@{$results->{'list'}}) {
         my $bresult = $results->{$bench};
 
-        printf $outFd "%-40s %12.1f %-5s (%.1f s, %d samples)\n",
+        printf $outFd "%-40s %12.1f %-5s (%.1f s, ",
                       $bresult->{'msg'},
                       $bresult->{'score'},
                       $bresult->{'scorelabel'},
-                      $bresult->{'time'},
-                      $bresult->{'iterations'};
+                      $bresult->{'time'};
+
+        if (defined($bresult->{'iterations'})) {
+           printf $outFd "%d samples)\n", $bresult->{'iterations'};
+        }
+        else {
+           printf $outFd "undef samples)\n";
+        }
     }
 
     printf $outFd "\n";
