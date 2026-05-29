@@ -32,6 +32,7 @@
 /* SCCSid is defined in dhry_1.c */
 
 #include <string.h>
+#include "timeit.h"
 #include "dhry.h"
 
 #ifndef REG

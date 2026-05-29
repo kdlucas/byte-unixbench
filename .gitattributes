@@ -1,0 +1,22 @@
+*.a binary
+*.bmp binary
+*.db binary
+*.exe binary
+*.gif binary
+*.ico binary
+*.jar binary
+*.jks binary
+*.jpg binary
+*.lib binary
+*.o binary
+*.oobj binary
+*.png binary
+*.rtf binary
+*.so binary
+*.wav binary
+*.zip binary
+*.dat binary
+*.gz binary
+*.tar binary
+*.sh text eol=lf
+

@@ -47,8 +47,8 @@
 
 void	wrapup(const char *);
 void	onalarm(int);
-void	pipeerr();
-void	grunt();
+void	pipeerr(void);
+void	grunt(void);
 void getwork(void);
 #if debug
 void dumpwork(void);
@@ -405,14 +405,14 @@ void onalarm(int foo)
     alarm(GRANULE);
 }
 
-void grunt()
+void grunt(void)
 {
     /* timeout after label "bepatient" in main */
     exit_status = 4;
     wrapup("Timed out waiting for jobs to finish ...");
 }
 
-void pipeerr()
+void pipeerr(void)
 {
 	sigpipe++;
 }

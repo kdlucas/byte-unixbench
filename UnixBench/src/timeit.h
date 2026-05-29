@@ -1,7 +1,7 @@
 /*******************************************************************************
  *          
  *  The BYTE UNIX Benchmarks - Release 3
- *          Module: timeit.c   SID: 3.3 5/15/91 19:30:21
+ *          Module: timeit.h   SID: 3.3 5/15/91 19:30:21
  *******************************************************************************
  * Bug reports, patches, comments, suggestions should be sent to:
  *
@@ -21,20 +21,8 @@
 
 /* this module is #included in other modules--no separate SCCS ID */
 
-/*
- *  Timing routine
- *
- */
-
-#include <signal.h>
-#include <unistd.h>
-#include "timeit.h"
-
-void wake_me(int seconds, void (*func)(int))
-{
-	/* set up the signal handler */
-	signal(SIGALRM, func);
-	/* get the clock running */
-	alarm(seconds);
-}
+#ifndef __TIMEIT_H__
+#define __TIMEIT_H__
+void wake_me(int, void (*func)(int));
+#endif
 
