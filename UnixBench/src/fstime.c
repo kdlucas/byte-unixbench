@@ -93,7 +93,11 @@ int                     g;
 int                     i;
 void                    stop_count();
 void                    clean_up();
+void                    do_sync();
 int                     sigalarm = 0;
+
+/* Non-0 to fsync this copy's test files instead of calling sync(). */
+int                     file_sync = 0;
 
 /******************** MAIN ****************************/
 
@@ -118,6 +122,9 @@ char    *argv[];
                 case 'w':
                     test = argv[i][1];
                     break;
+                case 'f':
+                    file_sync = 1;
+                    break;
                 case 'b':
                     bufsize = atoi(argv[++i]);
                     break;
@@ -134,11 +141,11 @@ char    *argv[];
                     }
                     break;
                 default:
-                    fprintf(stderr, "Usage: fstime [-c|-r|-w] [-b <bufsize>] [-m <max_blocks>] [-t <seconds>]\n");
+                    fprintf(stderr, "Usage: fstime [-c|-r|-w] [-b <bufsize>] [-m <max_blocks>] [-t <seconds>] [-f]\n");
                     exit(2);
             }
         } else {
-            fprintf(stderr, "Usage: fstime [-c|-r|-w] [-b <bufsize>] [-m <max_blocks>] [-t <seconds>]\n");
+            fprintf(stderr, "Usage: fstime [-c|-r|-w] [-b <bufsize>] [-m <max_blocks>] [-t <seconds>] [-f]\n");
             exit(2);
         }
     }
@@ -248,6 +255,25 @@ char    *argv[];
 }
 
 
+void do_sync(void)
+{
+        if (!file_sync) {
+                sync();
+                return;
+        }
+        if (fsync(f) < 0) {
+                perror("fstime: fsync input file");
+                clean_up();
+                exit(1);
+        }
+        if (fsync(g) < 0) {
+                perror("fstime: fsync output file");
+                clean_up();
+                exit(1);
+        }
+}
+
+
 static double getFloatTime()
 {
         struct timeval t;
@@ -269,9 +295,9 @@ int w_test(int timeSecs)
         extern int sigalarm;
 
         /* Sync and let it settle */
-        sync();
+        do_sync();
         sleep(2);
-        sync();
+        do_sync();
         sleep(2);
 
         /* Set an alarm. */
@@ -322,9 +348,9 @@ int r_test(int timeSecs)
         extern int sigalarm;
 
         /* Sync and let it settle */
-        sync();
+        do_sync();
         sleep(2);
-        sync();
+        do_sync();
         sleep(2);
 
         /* rewind */
@@ -386,9 +412,9 @@ int c_test(int timeSecs)
         double start, end;
         extern int sigalarm;
 
-        sync();
+        do_sync();
         sleep(2);
-        sync();
+        do_sync();
         sleep(1);
 
         /* rewind */
