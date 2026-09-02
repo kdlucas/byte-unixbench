@@ -108,6 +108,8 @@ my $quietMode = 0;
 my $notQuietMode = 1;
 my $verboseMode = 2;
 my $briefMode = 3;
+# Use per-file fsync() instead of Run-level sync() for "filesync" tests.
+my $fileSync = 0;
 
 ############################################################################
 # TEST SPECIFICATIONS
@@ -232,6 +234,7 @@ my $baseParams = {
     "stdout" => 1,                  # Non-0 to keep stdout.
     "stdin" => "",
     "logmsg" => "",
+    "filesync" => 0,                # Non-0 if the benchmark syncs its own files.
 };
 
 
@@ -286,54 +289,63 @@ my $testParams = {
         "cat"    => 'system',
         "prog" => "${BINDIR}/fstime",
         "options" => "-w -t 30 -d \"${TMPDIR}\" -b 1024 -m 2000",
+        "filesync" => 1,
     },
     "fstime-r" => {
         "logmsg" => "File Read 1024 bufsize 2000 maxblocks",
         "cat"    => 'system',
         "prog" => "${BINDIR}/fstime",
         "options" => "-r -t 30 -d \"${TMPDIR}\" -b 1024 -m 2000",
+        "filesync" => 1,
     },
    "fstime" => {
         "logmsg" => "File Copy 1024 bufsize 2000 maxblocks",
         "cat"    => 'system',
         "prog" => "${BINDIR}/fstime",
         "options" => "-c -t 30 -d \"${TMPDIR}\" -b 1024 -m 2000",
+        "filesync" => 1,
     },
     "fsbuffer-w" => {
         "logmsg" => "File Write 256 bufsize 500 maxblocks",
         "cat"    => 'system',
         "prog" => "${BINDIR}/fstime",
         "options" => "-w -t 30 -d \"${TMPDIR}\" -b 256 -m 500",
+        "filesync" => 1,
     },
     "fsbuffer-r" => {
         "logmsg" => "File Read 256 bufsize 500 maxblocks",
         "cat"    => 'system',
         "prog" => "${BINDIR}/fstime",
         "options" => "-r -t 30 -d \"${TMPDIR}\" -b 256 -m 500",
+        "filesync" => 1,
     },
     "fsbuffer" => {
         "logmsg" => "File Copy 256 bufsize 500 maxblocks",
         "cat"    => 'system',
         "prog" => "${BINDIR}/fstime",
         "options" => "-c -t 30 -d \"${TMPDIR}\" -b 256 -m 500",
+        "filesync" => 1,
     },
     "fsdisk-w" => {
         "logmsg" => "File Write 4096 bufsize 8000 maxblocks",
         "cat"    => 'system',
         "prog" => "${BINDIR}/fstime",
         "options" => "-w -t 30 -d \"${TMPDIR}\" -b 4096 -m 8000",
+        "filesync" => 1,
     },
     "fsdisk-r" => {
         "logmsg" => "File Read 4096 bufsize 8000 maxblocks",
         "cat"    => 'system',
         "prog" => "${BINDIR}/fstime",
         "options" => "-r -t 30 -d \"${TMPDIR}\" -b 4096 -m 8000",
+        "filesync" => 1,
     },
     "fsdisk" => {
         "logmsg" => "File Copy 4096 bufsize 8000 maxblocks",
         "cat"    => 'system',
         "prog" => "${BINDIR}/fstime",
         "options" => "-c -t 30 -d \"${TMPDIR}\" -b 4096 -m 8000",
+        "filesync" => 1,
     },
     "shell1" => {
         "logmsg" => "Shell Scripts (1 concurrent)",
@@ -1084,6 +1096,8 @@ sub parseArgs {
             $params->{'verbose'} = $briefMode;
         } elsif ($word eq "-i") {
             $params->{'iterations'} = shift(@words);
+        } elsif ($word eq "--file-sync") {
+            $params->{'fileSync'} = 1;
         } elsif ($word eq "-c") {
             if (!defined($params->{'copies'})) {
                 $params->{'copies'} = [ ];
@@ -1501,7 +1515,9 @@ sub runBenchmark {
 
     # Make up the command string based on the parameters.
     my $prog = $params->{'prog'} || $BINDIR . "/" . $bench;
-    my $command = sprintf "\"%s\" %s", $prog, $params->{'options'};
+    my $options = $params->{'options'};
+    $options .= " -f" if ($fileSync && $params->{'filesync'});
+    my $command = sprintf "\"%s\" %s", $prog, $options;
     $command .= " < \"" . $params->{'stdin'} . "\"" if ($params->{'stdin'});
     $command .= " 2>&1";
     $command .= $params->{'stdout'} ? (" >> \"" . $logFile . "\"") : " > /dev/null";
@@ -1529,7 +1545,9 @@ sub runBenchmark {
         printLog($logFile, "#### Pass %d\n\n", $i);
 
         # make an attempt to flush buffers
-        system("sync; sleep 1; sync; sleep 2");
+        if (!$fileSync || !$params->{'filesync'}) {
+            system("sync; sleep 1; sync; sleep 2");
+        }
         # display heartbeat
         if ($verbose > $quietMode) {
             printf " %d", $i;
@@ -2059,6 +2077,7 @@ sub main {
         $shortIterCount = int(($params->{'iterations'} + 1) / 3);
         $shortIterCount = 1 if ($shortIterCount < 1);
     }
+    $fileSync = 1 if ($params->{'fileSync'});
 
     # If no benchmark units have be specified, do "index".
     my $tests = $params->{'tests'};
@@ -2168,4 +2187,3 @@ sub main {
 
 
 exit(main(@ARGV));
-
