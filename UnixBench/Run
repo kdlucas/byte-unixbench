@@ -2053,7 +2053,7 @@ sub main {
     my @args = @_;
 
     my $params = parseArgs(@args);
-    my $verbose = $params->{'verbose'} || $notQuietMode;
+    my $verbose = defined($params->{'verbose'}) ? $params->{'verbose'} : $notQuietMode;
     if ($params->{'iterations'}) {
         $longIterCount = $params->{'iterations'};
         $shortIterCount = int(($params->{'iterations'} + 1) / 3);
