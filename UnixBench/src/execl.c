@@ -26,6 +26,7 @@ char SCCSid[] = "@(#) @(#)execl.c:3.3 -- 5/15/91 19:30:19";
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <time.h>
 
 char	bss[8*1024];	/* something worthwhile */
 
@@ -38,6 +39,15 @@ char	bss[8*1024];	/* something worthwhile */
 /* added by BYTE */
 char *getenv();
 
+/* monotonic clock in nanoseconds - replaces 1-second-resolution time().
+ * NOTE: assumes LP64 (unsigned long >= 64 bit), true on x86-64/aarch64. */
+static unsigned long mono_ns(void)
+{
+	struct timespec ts;
+	clock_gettime(CLOCK_MONOTONIC, &ts);
+	return (unsigned long)ts.tv_sec * 1000000000UL + ts.tv_nsec;
+}
+
 
 int main(argc, argv)	/* the real program */
 int	argc;
@@ -48,7 +58,7 @@ char	*argv[];
 	char *fullpath;
 	int 	duration;
 	char	count_str[12], start_str[24], path_str[256], *dur_str;
-	time_t	start_time, this_time;
+	unsigned long	start_time, this_time;
 
 #ifdef DEBUG
 	int count;
@@ -71,7 +81,7 @@ char	*argv[];
 		if((ptr = getenv("UB_BINDIR")) != NULL)
 			sprintf(path_str,"%s/execl",ptr);
 		fullpath=path_str;
-		time(&start_time);
+		start_time = mono_ns();
 		}
 	else  /* one of those execl'd invocations */
 		{
@@ -79,14 +89,14 @@ char	*argv[];
 		duration = atoi(argv[2]);
 		dur_str = argv[2];
 		iter = (unsigned long)atoi(argv[3]); /* where are we now ? */
-		sscanf(argv[4], "%lu", (unsigned long *) &start_time);
+		sscanf(argv[4], "%lu", &start_time);
 		fullpath = argv[0];
 		}
 
 	sprintf(count_str, "%lu", ++iter); /* increment the execl counter */
-	sprintf(start_str, "%lu", (unsigned long) start_time);
-	time(&this_time);
-	if (this_time - start_time >= duration) { /* time has run out */
+	sprintf(start_str, "%lu", start_time);
+	this_time = mono_ns();
+	if (this_time - start_time >= (unsigned long)duration * 1000000000UL) { /* time has run out */
 		fprintf(stderr, "COUNT|%lu|1|lps\n", iter);
 		exit(0);
 		}
