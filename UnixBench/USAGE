@@ -35,7 +35,7 @@ The Run script takes a number of options which you can use to customise a
 test, and you can specify the names of the tests to run.  The full usage
 is:
 
-    Run [ -q | -b | -v ] [-i <n> ] [-c <n> [-c <n> ...]] [test ...]
+    Run [ -q | -b | -v ] [--file-sync] [-i <n> ] [-c <n> [-c <n> ...]] [test ...]
 
 The option flags are:
 
@@ -46,6 +46,8 @@ The option flags are:
                 use <count> / 3, but at least 1.  Defaults to 10 (3 for
                 slow tests).
   -c <n>        Run <n> copies of each test in parallel.
+  --file-sync   Use per-file fsync() instead of system-wide sync() for the
+                fstime, fsbuffer, and fsdisk tests.
 
 The -c option can be given multiple times; for example:
 
@@ -404,4 +406,3 @@ simply being optimised out of existance is always present.
 All in all, the "index" and "gindex" tests (see above) are designed to
 give a reasonable measure of overall system performance; but the results
 of any test run should always be used with care.
-
