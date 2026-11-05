@@ -1,3 +1,51 @@
 UnixBench/pgms
 UnixBench/results
 UnixBench/tmp
+
+CmakeCache.txt
+*.cmake
+*.vcxproj
+*.vcxproj.filters
+*.sln
+CMakeFiles/
+_deps/
+build/
+*~
+*.sublime-project
+*.sublime-workspace
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+# Visual Studio 2015/2017 cache/options directory
+.vs/
+
+# IntelliJ IDE project directory
+.idea/
+
+# Visual C++ cache files
+ipch/
+*.aps
+*.ncb
+*.opendb
+*.opensdf
+*.sdf
+*.cachefile
+*.VC.db
+*.VC.VC.opendb

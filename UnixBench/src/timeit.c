@@ -28,10 +28,9 @@
 
 #include <signal.h>
 #include <unistd.h>
+#include "timeit.h"
 
-void wake_me(seconds, func)
-	int seconds;
-	void (*func)();
+void wake_me(int seconds, void (*func)(int))
 {
 	/* set up the signal handler */
 	signal(SIGALRM, func);
