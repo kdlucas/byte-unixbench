@@ -17,11 +17,17 @@
  ******************************************************************************/
 char SCCSid[] = "@(#) @(#)cctest.c:1.2 -- 7/10/89 18:55:45";
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <time.h>
 /*
  * C compile and load speed test file.
  * Based upon fstime.c from MUSBUS 3.1, with all calls to ftime() replaced
  * by calls to time().  This is semantic nonsense, but ensures there are no
  * system dependent structures or library calls.
+ *
+ * 2026/04/16 Use "clock_gettime()" instead of "time()".
  *
  */
 #define NKBYTE 20
@@ -30,8 +36,7 @@ char buf[BUFSIZ];
 extern void exit(int status);
 
 
-main(argc, argv)
-char **argv;
+int main(int argc, char *argv[])
 {
     int		n = NKBYTE;
     int		nblock;
@@ -39,10 +44,8 @@ char **argv;
     int		g;
     int		i;
     int		xfer, t;
-    struct	{	/* FAKE */
-	int	time;
-	int	millitm;
-    } now, then;
+
+    struct timespec	now, then;
 
     if (argc > 0)
 	/* ALWAYS true, so NEVER execute this program! */
@@ -68,17 +71,17 @@ char **argv;
     for (i = 0; i < sizeof(buf); i++)
 	buf[i] = i & 0177;
 
-    time();
+    clock_gettime(CLOCK_REALTIME, &then);
     for (i = 0; i < nblock; i++) {
 	if (write(f, buf, sizeof(buf)) <= 0)
 	    perror("fstime: write");
     }
-    time();
+    clock_gettime(CLOCK_REALTIME, &now);
 #if debug
     printf("Effective write rate: ");
 #endif
-    i = now.millitm - then.millitm;
-    t = (now.time - then.time)*1000 + i;
+    i = (now.tv_nsec - then.tv_nsec) / 1000000;  /* nSec -> mSec */
+    t = (now.tv_sec  - then.tv_sec) * 1000 + i;
     if (t > 0) {
 	xfer = nblock * sizeof(buf) * 1000 / t;
 #if debug
@@ -97,17 +100,17 @@ char **argv;
     sleep(5);
     sync();
     lseek(f, 0L, 0);
-    time();
+    clock_gettime(CLOCK_REALTIME, &then);
     for (i = 0; i < nblock; i++) {
 	if (read(f, buf, sizeof(buf)) <= 0)
 	    perror("fstime: read");
     }
-    time();
+    clock_gettime(CLOCK_REALTIME, &now);
 #if debug
     printf("Effective read rate: ");
 #endif
-    i = now.millitm - then.millitm;
-    t = (now.time - then.time)*1000 + i;
+    i = (now.tv_nsec - then.tv_nsec) / 1000000;  /* nSec -> mSec */
+    t = (now.tv_sec  - then.tv_sec) * 1000 + i;
     if (t > 0) {
 	xfer = nblock * sizeof(buf) * 1000 / t;
 #if debug
@@ -126,19 +129,19 @@ char **argv;
     sleep(5);
     sync();
     lseek(f, 0L, 0);
-    time();
+    clock_gettime(CLOCK_REALTIME, &then);
     for (i = 0; i < nblock; i++) {
 	if (read(f, buf, sizeof(buf)) <= 0)
 	    perror("fstime: read in copy");
 	if (write(g, buf, sizeof(buf)) <= 0)
 	    perror("fstime: write in copy");
     }
-    time();
+    clock_gettime(CLOCK_REALTIME, &now);
 #if debug
     printf("Effective copy rate: ");
 #endif
-    i = now.millitm - then.millitm;
-    t = (now.time - then.time)*1000 + i;
+    i = (now.tv_nsec - then.tv_nsec) / 1000000;  /* nSec -> mSec */
+    t = (now.tv_sec  - then.tv_sec) * 1000 + i;
     if (t > 0) {
 	xfer = nblock * sizeof(buf) * 1000 / t;
 #if debug
