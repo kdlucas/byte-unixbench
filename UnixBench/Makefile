@@ -46,7 +46,7 @@ SHELL = /bin/sh
 # X11 libraries on your system. (e.g. libX11-devel mesa-libGL-devel)
 #
 # Comment the line out to disable these tests.
-# GRAPHIC_TESTS = defined
+GRAPHIC_TESTS = defined
 
 # Set "GL_LIBS" to the libraries needed to link a GL program.
 GL_LIBS = -lGL -lXext -lX11
@@ -85,7 +85,8 @@ else
 
   ## gcc optimization flags
   ## (-ffast-math) disables strict IEEE or ISO rules/specifications for math funcs
-  OPTON = -O3 -ffast-math
+  ## (-std=c89) specifies the C standard to avoid errors from new compilers
+  OPTON = -O3 -ffast-math -std=c89
 
   ## OS detection.  Comment out if gmake syntax not supported by other 'make'. 
   OSNAME:=$(shell uname -s)
