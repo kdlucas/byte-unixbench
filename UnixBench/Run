@@ -1015,7 +1015,7 @@ sub getSystemInfo {
     }
 
     # Get graphics hardware info.
-    $info->{'graphics'} = getCmdOutput("3dinfo | cut -f1 -d\'(\'");
+    $info->{'graphics'} = getCmdOutput("command -v 3dinfo >/dev/null && 3dinfo | cut -f1 -d'('");
 
     # Get system run state, load and usage info.
     $info->{'runlevel'} = getCmdOutput("who -r | awk '{print \$3}'");
