@@ -30,7 +30,7 @@ char SCCSid[] = "@(#) @(#)syscall.c:3.3 -- 5/15/91 19:30:21";
 #include <sys/wait.h>
 #include <sys/syscall.h>
 #include <unistd.h>
-#include "timeit.c"
+#include "timeit.h"
 
 volatile unsigned long iter;
 

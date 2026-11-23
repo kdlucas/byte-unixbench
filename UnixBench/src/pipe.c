@@ -25,7 +25,7 @@ char SCCSid[] = "@(#) @(#)pipe.c:3.3 -- 5/15/91 19:30:20";
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-#include "timeit.c"
+#include "timeit.h"
 
 volatile unsigned long iter;
 

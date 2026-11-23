@@ -38,8 +38,8 @@ int	nusers;		/* number of concurrent users to be simulated by
 			 * this process */
 int	firstuser;	/* ordinal identification of first user for this
 			 * process */
-int	nwork = 0;	/* number of job streams */
-int	exit_status = 0;	/* returned to parent */
+int	nwork_dummy = 0;	/* number of job streams */
+int	exit_status_dummy = 0;	/* returned to parent */
 int	sigpipe;	/* pipe write error flag */
 
 struct st_work {
@@ -77,10 +77,10 @@ char	*argv[];
     int		nch;		/* # characters to write */
     int		written;	/* # characters actully written */
     char	logname[15];	/* name of the log file(s) */
-    void		onalarm(void);
-    void		pipeerr(void);
-    void		wrapup(void);
-    void		grunt(void);
+    void		onalarm_dummy(void);
+    void		pipeerr_dummy(void);
+    void		wrapup_dummy(void);
+    void		grunt_dummy(void);
     char	*malloc();
     int		pvec[2];	/* for pipes */
     char	*p;
@@ -131,7 +131,7 @@ char	*argv[];
     argv++;
 
     /* build job streams */
-    getwork();
+    getwork_dummy();
 #if debug
     dumpwork();
 #endif
@@ -150,7 +150,7 @@ char	*argv[];
 	    nchild = nusers - MAXCHILD;
 	if ((l = fork()) == -1) {
 	    /* fork failed */
-	    fatal("** clone fork failed **\n");
+	    fatal_dummy("** clone fork failed **\n");
 	    goto bepatient;
 	} else if (l > 0) {
 	    fprintf(stderr, "master clone pid %d\n", l);
@@ -189,8 +189,8 @@ char	*argv[];
     }
     est_rate = thres;
 
-    signal(SIGALRM, onalarm);
-    signal(SIGPIPE, pipeerr);
+    signal(SIGALRM, onalarm_dummy);
+    signal(SIGPIPE, pipeerr_dummy);
     alarm(GRANULE);
     while (done < nusers) {
 	for (i = 0; i < nusers; i++) {
@@ -268,31 +268,31 @@ bepatient:
 
 }
 
-onalarm()
+onalarm_dummy()
 {
     thres += est_rate;
-    signal(SIGALRM, onalarm);
+    signal(SIGALRM, onalarm_dummy);
     alarm(GRANULE);
 }
 
-grunt()
+grunt_dummy()
 {
     /* timeout after label "bepatient" in main */
-    exit_status = 4;
-    wrapup();
+    exit_status_dummy = 4;
+    wrapup_dummy();
 }
 
-pipeerr()
+pipeerr_dummy()
 {
 	sigpipe++;
 }
 
-wrapup()
+wrapup_dummy()
 {
     /* DUMMY, real code dropped */
 }
 
-getwork()
+getwork_dummy()
 {
 
     /* DUMMY, real code dropped */
@@ -302,7 +302,7 @@ getwork()
     open(); close();
 }
 
-fatal(s)
+fatal_dummy(s)
 char *s;
 {
     int	i;
@@ -314,6 +314,6 @@ char *s;
 	    fprintf(stderr, "pid %d killed off\n", child[i].pid);
     }
     fflush(stderr);
-    exit_status = 4;
+    exit_status_dummy = 4;
     return;
 }
