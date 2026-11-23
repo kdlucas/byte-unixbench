@@ -24,6 +24,9 @@ char SCCSid[] = "@(#) @(#)context1.c:3.3 -- 5/15/91 19:30:18";
  *
  */
 
+#define _GNU_SOURCE
+#include <sched.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -37,6 +40,10 @@ void report()
 	exit(0);
 }
 
+static int get_cpu_num(void){
+	return sysconf(_SC_NPROCESSORS_ONLN);
+}
+
 int main(argc, argv)
 int	argc;
 char	*argv[];
@@ -45,6 +52,7 @@ char	*argv[];
 	unsigned long	check;
 	int	p1[2], p2[2];
 	ssize_t ret;
+	int need_affinity;
 
 	if (argc != 2) {
 		fprintf(stderr, "Usage: context duration\n");
@@ -52,6 +60,14 @@ char	*argv[];
 	}
 
 	duration = atoi(argv[1]);
+
+	/* if os has more than one cpu, will bind parent process to cpu 0 and child process to other cpus
+	*	In this way, we can ensure context switch always happen
+	* */
+	if (get_cpu_num() > 1)
+		need_affinity = 1;
+	else
+		need_affinity = 0;
 
 	/* set up alarm call */
 	iter = 0;
@@ -64,6 +80,16 @@ char	*argv[];
 	}
 
 	if (fork()) {	/* parent process */
+		if (need_affinity) {
+			cpu_set_t pmask;
+			CPU_ZERO(&pmask);
+			CPU_SET(0, &pmask);
+			if (sched_setaffinity(0, sizeof(cpu_set_t), &pmask) == -1)
+			{
+				perror("parent sched_setaffinity failed");
+			}
+		}
+
 		/* master, write p1 & read p2 */
 		close(p1[0]); close(p2[1]);
 		while (1) {
@@ -94,6 +120,14 @@ char	*argv[];
 		}
 	}
 	else { /* child process */
+		if (need_affinity) {
+			cpu_set_t cmask;
+			if (sched_getaffinity(0, sizeof(cpu_set_t), &cmask) != -1) {
+				CPU_CLR(0, &cmask);
+				if (sched_setaffinity(0, sizeof(cpu_set_t), &cmask) == -1)
+					perror("child sched_setaffinity failed");
+			}
+		}
 		/* slave, read p1 & write p2 */
 		close(p1[1]); close(p2[0]);
 		while (1) {
